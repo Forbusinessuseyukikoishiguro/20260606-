@@ -1,0 +1,3260 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🐰 想定質問集ジェネレーター｜うさうさ研修工房</title>
+<style>
+:root{
+  --sky:#FFE8CD; --sky2:#FFD9B8;
+  --cream:#FFF7E8; --wall:#FFF2DC; --paper:#FFFDF6;
+  --mush:#D0544A; --mush-deep:#A93D33;
+  --honey:#E8B94A; --honey-soft:#F6DFA4; --gold:#F3C64F;
+  --leaf:#7FAE63; --leaf-deep:#4E7A43; --leaf-bg:#EFF6E8; --leaf-line:#C2DBAF;
+  --wood:#8A5A3B; --wood-deep:#6B4226; --wood-soft:#B08968;
+  --ink:#4A3424; --pink:#F6B8AE;
+  --blue:#5B87A0; --purple:#8A6FA0;
+  --shadow:0 5px 16px rgba(107,66,38,.14);
+  --dots:radial-gradient(circle at 22% 30%, #FFF9EE 0 8%, transparent 9%),
+         radial-gradient(circle at 58% 18%, #FFF9EE 0 10%, transparent 11%),
+         radial-gradient(circle at 84% 55%, #FFF9EE 0 7%, transparent 8%),
+         radial-gradient(circle at 38% 72%, #FFF9EE 0 6%, transparent 7%);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{
+  font-family:'Hiragino Maru Gothic ProN','Hiragino Kaku Gothic ProN','BIZ UDPGothic','Yu Gothic','Meiryo',sans-serif;
+  background:
+    radial-gradient(circle at 18% 12%, rgba(246,184,174,.20) 0, transparent 32%),
+    radial-gradient(circle at 86% 6%, rgba(243,198,79,.18) 0, transparent 28%),
+    radial-gradient(#F2E4C8 1.1px, transparent 1.2px),
+    linear-gradient(180deg, var(--sky) 0%, var(--cream) 34%, var(--cream) 100%);
+  background-size:auto,auto,26px 26px,auto;
+  color:var(--ink);
+  min-height:100vh;
+  line-height:1.75;
+}
+/* ===== 絵本のとびら（ヘッダー）===== */
+header{
+  position:relative;
+  padding:20px 24px 30px 218px;
+  min-height:128px;
+  background:linear-gradient(180deg, var(--sky2) 0%, var(--sky) 70%, transparent 100%);
+  overflow:visible;
+}
+header .scene{
+  position:absolute;left:14px;bottom:-6px;width:196px;height:auto;
+  filter:drop-shadow(0 4px 6px rgba(107,66,38,.18));
+}
+header h1{
+  font-size:1.5rem;letter-spacing:.06em;color:var(--wood-deep);
+  text-shadow:2px 2px 0 #fff, -2px 2px 0 #fff, 2px -2px 0 #fff, -2px -2px 0 #fff,
+              0 3px 0 rgba(255,255,255,.9), 0 5px 10px rgba(107,66,38,.18);
+}
+header .sub{
+  display:inline-block;margin-top:7px;font-size:.8rem;color:var(--wood);
+  background:rgba(255,255,255,.75);border:1.5px dashed var(--wood-soft);
+  border-radius:999px;padding:2px 14px;
+}
+header .badge{
+  display:inline-block;vertical-align:4px;margin-left:10px;
+  background:var(--leaf);color:#fff;border:2px solid #fff;
+  border-radius:999px;padding:0 10px;font-size:.66rem;letter-spacing:.05em;
+  box-shadow:0 2px 4px rgba(78,122,67,.35);
+}
+header .spark{position:absolute;font-size:1rem;color:var(--gold);animation:twinkle 2.6s ease-in-out infinite;pointer-events:none;}
+header .spark.s2{animation-delay:1.1s;font-size:.75rem;color:var(--pink);}
+@keyframes twinkle{0%,100%{opacity:.25;transform:scale(.8) rotate(0deg);}50%{opacity:1;transform:scale(1.15) rotate(20deg);}}
+header .ai-mode{
+  position:absolute;right:16px;top:12px;z-index:2;width:248px;
+  background:rgba(255,255,255,.88);border:2px solid var(--honey-soft);
+  border-radius:14px;padding:8px 12px 9px;box-shadow:0 3px 8px rgba(107,66,38,.12);
+}
+header .ai-mode select, header .ai-mode input{width:100%;}
+@media(max-width:900px){header .ai-mode{position:static;width:100%;max-width:340px;margin-top:10px;}}
+/* ===== 統計：木の実バッジ ===== */
+.stats-bar{
+  display:flex;gap:10px;flex-wrap:wrap;padding:12px 24px;
+  font-size:.78rem;color:var(--wood);position:relative;z-index:1;
+}
+.stats-bar .chip{
+  background:var(--paper);border:2px solid var(--honey-soft);border-bottom-width:3px;
+  border-radius:999px;padding:2px 14px;box-shadow:0 2px 4px rgba(107,66,38,.08);
+}
+.stats-bar .chip b{color:var(--mush);font-size:.95rem;}
+/* ===== タブ：キノコの傘 ===== */
+nav{display:flex;gap:7px;flex-wrap:wrap;padding:10px 24px 0;}
+nav button{
+  font-family:inherit;font-size:.86rem;font-weight:700;
+  border:2.5px solid var(--wood-soft);border-bottom:none;
+  background:var(--wall);color:var(--wood);
+  border-radius:16px 16px 5px 5px;
+  padding:10px 17px 9px;cursor:pointer;transition:.2s;
+  box-shadow:inset 0 -4px 0 rgba(176,137,104,.18);
+}
+nav button:hover{transform:translateY(-3px);background:#FFE9C9;}
+nav button.active{
+  background:var(--mush);background-image:var(--dots);
+  color:#fff;border-color:var(--wood);
+  text-shadow:0 1px 2px rgba(107,33,26,.45);
+  box-shadow:inset 0 -4px 0 rgba(107,33,26,.25), 0 -4px 10px rgba(208,84,74,.25);
+}
+/* ===== おうちの中（メイン）===== */
+main{
+  background:var(--paper);margin:0 24px 26px;
+  border:3px solid var(--wood);border-radius:6px 22px 22px 22px;
+  padding:26px;box-shadow:var(--shadow);
+  position:relative;
+}
+main::before{
+  content:"";position:absolute;inset:7px;pointer-events:none;
+  border:1.5px dashed var(--honey-soft);border-radius:4px 16px 16px 16px;
+}
+.tab{display:none;position:relative;}
+.tab.active{display:block;animation:fadeUp .3s ease;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:none;}}
+h2{
+  font-size:1.08rem;color:var(--mush-deep);margin-bottom:14px;
+  padding-bottom:6px;border-bottom:2.5px dashed var(--leaf-line);
+}
+h2::before{content:"🍄 ";}
+h3{font-size:.95rem;color:var(--leaf-deep);margin:20px 0 8px;}
+h3::before{content:"🌱 ";font-size:.85em;}
+.note{
+  background:var(--wall);border:2px solid var(--honey-soft);border-radius:14px;
+  padding:11px 15px;font-size:.82rem;color:var(--wood);margin-bottom:14px;
+  box-shadow:inset 0 2px 0 rgba(255,255,255,.8);
+}
+.note b{color:var(--mush);}
+label{display:block;font-size:.82rem;font-weight:700;color:var(--wood);margin:12px 0 4px;}
+input[type=text],textarea,select{
+  width:100%;font-family:inherit;font-size:.9rem;
+  border:2px solid var(--honey-soft);border-radius:12px;
+  padding:8px 13px;background:#fff;color:var(--ink);transition:.15s;
+}
+input[type=text]:focus,textarea:focus,select:focus{
+  outline:none;border-color:var(--leaf);box-shadow:0 0 0 3px rgba(127,174,99,.18);
+}
+textarea{resize:vertical;}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+@media(max-width:760px){.row2{grid-template-columns:1fr;} header{padding-left:24px;} header .scene{display:none;}}
+/* ===== ボタン：キノコと木のドア ===== */
+.btn{
+  font-family:inherit;font-weight:700;font-size:.88rem;
+  border:none;border-radius:999px;padding:10px 22px;cursor:pointer;
+  transition:.2s;box-shadow:0 4px 0 rgba(107,66,38,.28), 0 6px 12px rgba(107,66,38,.15);
+}
+.btn:hover{transform:translateY(-3px) rotate(-.6deg);box-shadow:0 7px 0 rgba(107,66,38,.24), 0 10px 16px rgba(107,66,38,.2);}
+.btn:active{transform:translateY(1px);box-shadow:0 2px 0 rgba(107,66,38,.3);}
+.btn-main{background:var(--mush);background-image:var(--dots);color:#fff;border:2px solid var(--mush-deep);text-shadow:0 1px 2px rgba(107,33,26,.4);}
+.btn-gold{background:linear-gradient(180deg,var(--gold),var(--honey));color:#6B4226;border:2px solid #C99A2E;}
+.btn-sub{background:#fff;color:var(--mush);border:2px solid var(--mush);box-shadow:none;}
+.btn-danger{background:#fff;color:var(--mush-deep);border:2px dashed var(--mush);box-shadow:none;padding:6px 14px;font-size:.78rem;}
+.btn-mini{padding:4px 12px;font-size:.75rem;box-shadow:0 2px 0 rgba(107,66,38,.25);}
+.btn-row{display:flex;gap:12px;flex-wrap:wrap;margin:14px 0;}
+/* ===== 巻物（プロンプト）===== */
+textarea.prompt-box{width:100%;min-height:340px;resize:vertical;display:block;}
+textarea.prompt-box:focus{outline:none;border-color:var(--honey);box-shadow:0 0 0 3px rgba(232,185,74,.25);}
+.prompt-box{
+  background:#4A3424;color:#FFE9C2;border-radius:14px;padding:16px;
+  font-family:'Consolas','Menlo',monospace;font-size:.78rem;line-height:1.65;
+  white-space:pre-wrap;max-height:420px;overflow:auto;
+  border:3px solid var(--wood);box-shadow:inset 0 0 24px rgba(0,0,0,.35);
+}
+.copied{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);
+  background:var(--leaf-deep);color:#fff;border:2px solid #fff;border-radius:999px;padding:8px 22px;font-size:.85rem;
+  box-shadow:var(--shadow);opacity:0;pointer-events:none;transition:.3s;z-index:99;}
+.copied.show{opacity:1;}
+/* ===== 編集テーブル：木の棚 ===== */
+table.editor{width:100%;border-collapse:collapse;font-size:.8rem;}
+table.editor th{
+  background:var(--honey-soft);color:var(--wood-deep);padding:6px 8px;text-align:left;
+  border:1px solid #E5CE9C;font-size:.74rem;white-space:nowrap;
+}
+table.editor td{
+  border:1px solid #F0E3C2;padding:6px 8px;vertical-align:top;background:#fff;min-width:90px;
+}
+table.editor td[contenteditable]{cursor:text;}
+table.editor td[contenteditable]:focus{outline:2px solid var(--leaf);background:#FBFFF7;border-radius:4px;}
+table.editor tr:hover td{background:#FFF6E2;}
+.editor-wrap{overflow-x:auto;border-radius:12px;border:2.5px solid var(--wood-soft);box-shadow:0 3px 0 rgba(107,66,38,.15);}
+/* ===== レベル木の実 ===== */
+.lv{display:inline-block;border-radius:999px;padding:0 10px;font-size:.7rem;font-weight:700;color:#fff;white-space:nowrap;border:1.5px solid rgba(255,255,255,.6);}
+.lv-初級{background:var(--leaf);}
+.lv-中級{background:var(--blue);}
+.lv-上級{background:var(--mush);}
+.lv-発表{background:var(--purple);}
+/* ===== 検索：はちみつ色の窓 ===== */
+.search-big{
+  font-size:1.05rem !important;padding:13px 18px !important;
+  background:#FFF3BF !important;border:3px solid var(--honey) !important;border-radius:16px !important;
+  box-shadow:inset 0 2px 6px rgba(201,154,46,.2);
+}
+.hit-count{font-size:.85rem;font-weight:700;color:var(--mush-deep);margin:10px 0;}
+.hit-count::before{content:"🔔 ";}
+/* ===== カード：小さなおうち ===== */
+.card{
+  background:#fff;border:2px solid var(--honey-soft);border-top:7px solid var(--mush);
+  border-radius:14px;padding:13px 16px;margin-bottom:13px;
+  box-shadow:0 3px 0 rgba(107,66,38,.1), 0 4px 10px rgba(107,66,38,.08);
+  position:relative;
+}
+.card::before{
+  content:"";position:absolute;top:-7px;left:14px;width:46px;height:7px;
+  background:radial-gradient(circle at 8px 3.5px,#FFF9EE 0 2.6px,transparent 3px),
+             radial-gradient(circle at 30px 3.5px,#FFF9EE 0 2.2px,transparent 2.6px);
+}
+.card .q{font-weight:700;font-size:.95rem;color:var(--ink);margin:4px 0 10px;}
+.card .meta{font-size:.72rem;color:var(--wood-soft);}
+.ans2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+@media(max-width:760px){.ans2{grid-template-columns:1fr;}}
+.ans{border-radius:12px;padding:10px 12px;font-size:.82rem;}
+.ans .tag{font-size:.7rem;font-weight:700;display:block;margin-bottom:4px;}
+.ans-b{background:#FFF1E2;border:2px solid #F2CFA6;}
+.ans-b .tag{color:#CB6A2A;}
+.ans-r{background:var(--leaf-bg);border:2px solid var(--leaf-line);}
+.ans-r .tag{color:var(--leaf-deep);}
+.kw{font-size:.7rem;color:var(--wood-soft);margin-top:8px;}
+.kw mark,.card mark{background:#FFE36E;border-radius:3px;padding:0 2px;}
+/* ===== 絵本のページ（手順）===== */
+details.step{
+  border:2px solid var(--honey-soft);border-left:7px solid var(--leaf);
+  border-radius:12px;margin-bottom:10px;background:#fff;
+}
+details.step summary{
+  cursor:pointer;font-weight:700;color:var(--wood-deep);padding:10px 14px;font-size:.9rem;list-style:none;
+}
+details.step summary::before{content:"🚪 ";}
+details.step[open] summary::before{content:"🏡 ";}
+details.step .inner{padding:0 16px 14px;font-size:.84rem;}
+.import-status{font-size:.84rem;margin-top:10px;padding:11px 15px;border-radius:12px;display:none;}
+.import-status.ok{display:block;background:var(--leaf-bg);border:2px solid var(--leaf);color:var(--leaf-deep);}
+.import-status.ng{display:block;background:#FAE9E6;border:2px solid var(--mush);color:#8F3B2D;}
+/* ===== 草原（フッター）===== */
+footer{
+  text-align:center;font-size:.74rem;color:#3E5C33;
+  background:linear-gradient(180deg, transparent 0, transparent 14px, var(--leaf) 14px, var(--leaf-deep) 100%);
+  padding:20px 0 14px;margin-top:-6px;position:relative;
+}
+footer::before{
+  content:"";position:absolute;top:4px;left:0;right:0;height:20px;
+  background:radial-gradient(circle at 10px -4px, transparent 11px, var(--leaf) 12px);
+  background-size:24px 20px;background-repeat:repeat-x;
+}
+footer span{position:relative;color:#FFF7E8;text-shadow:0 1px 2px rgba(0,0,0,.2);}
+.section-head{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-top:22px;}
+.save-pill{font-size:.7rem;color:var(--wood-soft);}
+
+/* ===== うさうさ案内バー ===== */
+#usaGuide{
+  max-width:1080px;margin:8px auto 0;padding:7px 16px;
+  background:#FFF7E8;border:2px dashed var(--honey-soft);border-radius:999px;
+  font-size:.8rem;color:#8A5A3B;
+}
+#guideRow{ max-width:1080px; margin:8px auto 0; display:flex; align-items:center; gap:10px; padding:0 4px; }
+#guideRow #usaGuide{ margin:0; flex:1; }
+#subRabbit{ width:74px; height:64px; flex:none; }
+#subRabbit svg{ width:100%; height:100%; }
+#srBunny{ animation: srBreath 3.4s ease-in-out infinite; transform-origin:48px 38px; }
+@keyframes srBreath{ 0%,100%{ transform:translate(48px,30px) scale(1,1);} 50%{ transform:translate(48px,30px) scale(1.02,.98);} }
+#subRabbit.support #srBunny{ animation: srHop .6s ease-out 2; }
+@keyframes srHop{ 0%,100%{ transform:translate(48px,30px);} 40%{ transform:translate(48px,24px);} }
+#subRabbit.support #srBoard{ animation: srWave .6s ease-in-out 2; transform-origin:18px 50px; }
+@keyframes srWave{ 0%,100%{ transform:rotate(0);} 50%{ transform:rotate(-6deg);} }
+@media (prefers-reduced-motion: reduce){ #srBunny, #subRabbit.support #srBunny, #subRabbit.support #srBoard{ animation:none !important; } }
+@media (max-width:600px){ #subRabbit{ display:none; } }
+
+/* ===== ころころキノコ（ひかえめ演出） ===== */
+#mushRunner{
+  position:fixed;bottom:4px;left:0;width:44px;height:44px;
+  z-index:5;pointer-events:none;display:none;opacity:.92;
+  filter:drop-shadow(0 2px 2px rgba(107,66,38,.18));
+}
+#mushToggle{cursor:pointer;text-decoration:underline dotted;}
+#mushRunner #mushBody{ animation: mushWiggle 0.55s ease-in-out infinite alternate; transform-origin:18px 19px; }
+@keyframes mushWiggle{ from{ transform:translate(18px,19px) rotate(-4deg) scale(1,1);} to{ transform:translate(18px,19px) rotate(4deg) scale(1.04,.96);} }
+@media (prefers-reduced-motion: reduce){ #mushRunner{ display:none !important; } }
+</style>
+</head>
+<body>
+
+<header>
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 185 120" class="scene">
+<defs>
+ <radialGradient id="capG" cx="42%" cy="22%" r="85%">
+   <stop offset="0%" stop-color="#F2A095"/><stop offset="55%" stop-color="#E8867B"/><stop offset="100%" stop-color="#D86E62"/>
+ </radialGradient>
+ <radialGradient id="capG2" cx="42%" cy="25%" r="85%">
+   <stop offset="0%" stop-color="#FBD98E"/><stop offset="100%" stop-color="#E8B94A"/>
+ </radialGradient>
+ <linearGradient id="wallG" x1="0" y1="0" x2="0" y2="1">
+   <stop offset="0%" stop-color="#FFF7E8"/><stop offset="100%" stop-color="#FBE9CB"/>
+ </linearGradient>
+ <linearGradient id="furG" x1="0" y1="0" x2="0" y2="1">
+   <stop offset="0%" stop-color="#FFFFFF"/><stop offset="100%" stop-color="#FBF1E4"/>
+ </linearGradient>
+ <filter id="soft" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="0.7"/></filter>
+ <filter id="soft2" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="1.4"/></filter>
+</defs>
+<ellipse cx="86" cy="107" rx="74" ry="9" fill="#7FAE63"/>
+<ellipse cx="86" cy="105" rx="66" ry="7" fill="#94C178"/>
+<rect x="40" y="58" width="60" height="45" rx="8" fill="url(#wallG)" stroke="#C9A07C" stroke-width="2"/>
+<line x1="41" y1="71" x2="99" y2="71" stroke="#EFD7AE" stroke-width="1.5"/>
+<rect x="84" y="16" width="9" height="13" rx="3" fill="#C9906B" stroke="#B27B55" stroke-width="1.6"/>
+<circle cx="96" cy="10" r="3.6" fill="#FFFFFF" opacity=".9" filter="url(#soft)"/>
+<circle cx="102" cy="5" r="2.5" fill="#FFFFFF" opacity=".6" filter="url(#soft)"/>
+<path d="M32,62 C32,18 108,18 108,62 A6.8,6.8 0 0 1 97.1,62 A6.8,6.8 0 0 1 86.3,62 A6.8,6.8 0 0 1 75.4,62 A6.8,6.8 0 0 1 64.6,62 A6.8,6.8 0 0 1 53.7,62 A6.8,6.8 0 0 1 42.9,62 A6.8,6.8 0 0 1 32.0,62 Z" fill="url(#capG)" stroke="#C9655B" stroke-width="1.8" stroke-linejoin="round"/>
+<ellipse cx="56" cy="33" rx="12" ry="6" fill="#FFFFFF" opacity=".28" filter="url(#soft2)"/>
+<circle cx="54" cy="42" r="5.2" fill="#FFF6EC" filter="url(#soft)"/>
+<circle cx="76" cy="32" r="6.4" fill="#FFF6EC" filter="url(#soft)"/>
+<circle cx="92" cy="45" r="4.4" fill="#FFF6EC" filter="url(#soft)"/>
+<path d="M48,103 v-15 a8.5,8.5 0 0 1 17,0 v15 Z" fill="#C9906B" stroke="#B27B55" stroke-width="1.8"/>
+<circle cx="61" cy="94" r="1.6" fill="#F3C64F"/>
+<circle cx="84" cy="85" r="10.5" fill="#FFE9A8" stroke="#C9A07C" stroke-width="2"/>
+<path d="M90.2,87.0 A2.7,2.7 0 0 1 88.4,91.0 A2.9,2.9 0 0 1 84.0,92.6 A2.9,2.9 0 0 1 79.6,91.0 A2.7,2.7 0 0 1 77.8,87.0 A2.7,2.7 0 0 1 79.6,83.0 A2.9,2.9 0 0 1 84.0,81.4 A2.9,2.9 0 0 1 88.4,83.0 A2.7,2.7 0 0 1 90.2,87.0 Z" fill="#FFFFFF"/>
+<ellipse cx="81" cy="78" rx="2.1" ry="5.4" fill="#FFFFFF"/>
+<ellipse cx="87" cy="78" rx="2.1" ry="5.4" fill="#FFFFFF"/>
+<ellipse cx="81" cy="78.6" rx=".9" ry="3.6" fill="#F8C9C2"/>
+<ellipse cx="87" cy="78.6" rx=".9" ry="3.6" fill="#F8C9C2"/>
+<circle cx="81.8" cy="85.6" r=".95" fill="#3E2E1E"/><circle cx="86.2" cy="85.6" r=".95" fill="#3E2E1E"/>
+<circle cx="82.1" cy="85.3" r=".3" fill="#FFF"/><circle cx="86.5" cy="85.3" r=".3" fill="#FFF"/>
+<circle cx="79.6" cy="87.6" r="1.2" fill="#F8C9C2" filter="url(#soft)"/><circle cx="88.4" cy="87.6" r="1.2" fill="#F8C9C2" filter="url(#soft)"/>
+<path d="M83,87.6 q1,.9 2,0 M84,87.7 v-1" stroke="#A98770" stroke-width=".7" fill="none" stroke-linecap="round"/>
+<ellipse cx="138" cy="104" rx="15" ry="3.4" fill="#6E9D5C" opacity=".5" filter="url(#soft2)"/>
+<path d="M131,80 C125,56 136,56 135,78 Z" fill="url(#furG)" stroke="#E3CDB7" stroke-width="1.4" stroke-linejoin="round"/>
+<path d="M141,78 C140,54 152,58 145,80 Z" fill="url(#furG)" stroke="#E3CDB7" stroke-width="1.4" stroke-linejoin="round"/>
+<path d="M131.8,77 C128,60 134,60 133.4,76 Z" fill="#F8C9C2" filter="url(#soft)"/>
+<path d="M142.6,76 C142,59 149,62 144.2,77 Z" fill="#F8C9C2" filter="url(#soft)"/>
+<path d="M149.5,99.0 A3.8,3.8 0 0 1 147.3,104.6 A4.2,4.2 0 0 1 141.6,108.0 A4.4,4.4 0 0 1 134.4,108.0 A4.2,4.2 0 0 1 128.7,104.6 A3.8,3.8 0 0 1 126.5,99.0 A3.8,3.8 0 0 1 128.7,93.4 A4.2,4.2 0 0 1 134.4,90.0 A4.4,4.4 0 0 1 141.6,90.0 A4.2,4.2 0 0 1 147.3,93.4 A3.8,3.8 0 0 1 149.5,99.0 Z" fill="url(#furG)" stroke="#E3CDB7" stroke-width="1.4"/>
+<ellipse cx="133.5" cy="106" rx="3" ry="2.2" fill="#FFFFFF" stroke="#E3CDB7" stroke-width="1.1"/>
+<ellipse cx="142.5" cy="106" rx="3" ry="2.2" fill="#FFFFFF" stroke="#E3CDB7" stroke-width="1.1"/>
+<path d="M148.5,86.0 A4.1,4.1 0 0 1 146.0,92.1 A4.4,4.4 0 0 1 139.8,95.4 A4.5,4.5 0 0 1 132.8,94.2 A4.3,4.3 0 0 1 128.1,89.2 A4.1,4.1 0 0 1 128.1,82.8 A4.3,4.3 0 0 1 132.8,77.8 A4.5,4.5 0 0 1 139.8,76.6 A4.4,4.4 0 0 1 146.0,79.9 A4.1,4.1 0 0 1 148.5,86.0 Z" fill="url(#furG)" stroke="#E3CDB7" stroke-width="1.4"/>
+<path d="M128,89 q-2.5,.5 -3.5,2 M148,89 q2.5,.5 3.5,2" stroke="#E3CDB7" stroke-width="1" fill="none" stroke-linecap="round"/>
+<circle cx="134.2" cy="85.5" r="1.5" fill="#3E2E1E"/><circle cx="141.8" cy="85.5" r="1.5" fill="#3E2E1E"/>
+<circle cx="134.7" cy="85" r=".55" fill="#FFF"/><circle cx="142.3" cy="85" r=".55" fill="#FFF"/>
+<circle cx="133.8" cy="86.2" r=".25" fill="#FFF" opacity=".9"/><circle cx="141.4" cy="86.2" r=".25" fill="#FFF" opacity=".9"/>
+<circle cx="131.4" cy="89" r="2" fill="#F8C9C2" filter="url(#soft)"/>
+<circle cx="144.6" cy="89" r="2" fill="#F8C9C2" filter="url(#soft)"/>
+<ellipse cx="138" cy="88.2" rx=".9" ry=".7" fill="#F09A93"/>
+<path d="M136.2,90.2 q.9,1.1 1.8,0 q.9,1.1 1.8,0 M138,90.2 v-1.6" stroke="#A98770" stroke-width=".8" fill="none" stroke-linecap="round"/>
+<ellipse cx="138" cy="100" rx="5.5" ry="4.5" fill="#FFFFFF" opacity=".8" filter="url(#soft)"/>
+<g transform="translate(20,88) scale(0.72)"><rect x="-4.5" y="0" width="9" height="12" rx="4" fill="url(#wallG)" stroke="#D9BC95" stroke-width="1.4"/><path d="M-12,3 C-12,-13 12,-13 12,3 A3.9,3.9 0 0 1 6.0,3 A3.9,3.9 0 0 1 0.0,3 A3.9,3.9 0 0 1 -6.0,3 A3.9,3.9 0 0 1 -12.0,3 Z" fill="url(#capG)" stroke="#C9906B" stroke-width="1.3" stroke-linejoin="round"/><circle cx="-4" cy="-4" r="2.2" fill="#FFF6EC" filter="url(#soft)"/><circle cx="4" cy="-6" r="2.6" fill="#FFF6EC" filter="url(#soft)"/><ellipse cx="-3" cy="-9" rx="3.4" ry="1.7" fill="#FFFFFF" opacity=".3" filter="url(#soft)"/></g>
+<g transform="translate(113,92) scale(0.6)"><rect x="-4.5" y="0" width="9" height="12" rx="4" fill="url(#wallG)" stroke="#D9BC95" stroke-width="1.4"/><path d="M-12,3 C-12,-13 12,-13 12,3 A3.9,3.9 0 0 1 6.0,3 A3.9,3.9 0 0 1 0.0,3 A3.9,3.9 0 0 1 -6.0,3 A3.9,3.9 0 0 1 -12.0,3 Z" fill="url(#capG2)" stroke="#C9906B" stroke-width="1.3" stroke-linejoin="round"/><circle cx="-4" cy="-4" r="2.2" fill="#FFF6EC" filter="url(#soft)"/><circle cx="4" cy="-6" r="2.6" fill="#FFF6EC" filter="url(#soft)"/><ellipse cx="-3" cy="-9" rx="3.4" ry="1.7" fill="#FFFFFF" opacity=".3" filter="url(#soft)"/></g>
+<path d="M20,32 l2,5 5,2 -5,2 -2,5 -2,-5 -5,-2 5,-2 Z" fill="#F3C64F"/>
+<path d="M165,40 l1.5,3.8 3.8,1.5 -3.8,1.5 -1.5,3.8 -1.5,-3.8 -3.8,-1.5 3.8,-1.5 Z" fill="#F3C64F" opacity=".85"/>
+<circle cx="34" cy="50" r="1.7" fill="#F6B8AE"/>
+<g transform="translate(160,99)"><circle r="1.6" fill="#F3C64F"/><circle cx="-2.6" r="1.5" fill="#F8C9C2"/><circle cx="2.6" r="1.5" fill="#F8C9C2"/><circle cy="-2.6" r="1.5" fill="#F8C9C2"/><circle cy="2.6" r="1.5" fill="#F8C9C2"/></g>
+</svg>
+
+  <span class="spark" style="top:16px;right:14%;">✦</span>
+  <span class="spark s2" style="top:52px;right:7%;">✦</span>
+  <span class="spark s2" style="top:12px;right:30%;">✦</span>
+  <h1>想定質問集ジェネレーター <span class="badge">v1.21.0 PRO</span></h1>
+  <div class="sub">🍄 文系にはたとえで、理系には技術で。ふわっとした質問には仮説で。｜うさうさ研修工房 🐰</div>
+  <div class="ai-mode" id="aiModePanel">
+    <label style="margin:0 0 3px;font-size:.72rem;">AI接続モード</label>
+    <select id="aiModeSelect" style="font-size:.78rem;padding:5px 8px;">
+      <option value="claude" selected>☁️ Claude内で使う（キー不要・既定）</option>
+      <option value="key">🔑 APIキーで使う（ローカル/オフライン環境）</option>
+      <option value="manual">✍️ 手動コピペで使う（AI接続なし）</option>
+    </select>
+    <div id="keyWrap" style="display:none;margin-top:5px;">
+      <input type="password" id="apiKeyInput" placeholder="sk-ant-api03-..." autocomplete="off" style="font-size:.75rem;padding:5px 8px;">
+    </div>
+    <div class="save-pill" id="apiKeyStatus" style="margin-top:4px;">☁️ claude.ai内ならこのまま動きます</div>
+  </div>
+</header>
+
+<div class="stats-bar" id="statsBar"></div>
+
+<nav id="nav">
+  <button data-tab="tab-setting" class="active">① 🏠 設定</button>
+  <button data-tab="tab-prompt">② 🤖 AIプロンプト</button>
+  <button data-tab="tab-import">③ 📥 インポート</button>
+  <button data-tab="tab-edit">④ ✏️ 編集</button>
+  <button data-tab="tab-search">⑤ 🔍 検索</button>
+  <button data-tab="tab-assist">⑥ ⚡ 即答</button>
+  <button data-tab="tab-lesson">⑦ 🗂 レッスン記録</button>
+  <button data-tab="tab-ws">⑧ 📦 当日資料</button>
+  <button data-tab="tab-article">⑨ 📰 記事工房</button>
+  <button data-tab="tab-export">⑩ 📤 保存・出力</button>
+  <button data-tab="tab-pdca">⑪ 🧭 中間チェック</button>
+</nav>
+<div id="guideRow">
+<div id="subRabbit" title="サブ講師うさぎ：だまって見守っています">
+  <svg viewBox="0 0 64 56" aria-hidden="true">
+    <defs>
+      <linearGradient id="srFur" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#FFFFFF"/><stop offset="100%" stop-color="#FBF1E4"/>
+      </linearGradient>
+      <filter id="srSoft" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="0.6"/></filter>
+    </defs>
+    <!-- 看板 -->
+    <g id="srBoard">
+      <rect x="2" y="14" width="34" height="22" rx="5" fill="#FFF7E8" stroke="#C9A36B" stroke-width="1.6"/>
+      <rect x="16" y="36" width="4" height="14" rx="2" fill="#C9A36B"/>
+      <text id="srBoardText" x="19" y="27" text-anchor="middle" font-size="6.2" fill="#8A5A3B" font-weight="bold">みまもり中</text>
+    </g>
+    <!-- うさぎ本体（ふわふわ） -->
+    <g id="srBunny" transform="translate(48,30)">
+      <path d="M-6,-7 C-10,-22 -3,-22 -3.6,-8 Z" fill="url(#srFur)" stroke="#E3CDB7" stroke-width="1.2"/>
+      <path d="M3.6,-8 C3,-23 10,-21 6,-7 Z" fill="url(#srFur)" stroke="#E3CDB7" stroke-width="1.2"/>
+      <path d="M-5,-9 C-8,-19 -4,-19 -4.4,-9.5 Z" fill="#F8C9C2" filter="url(#srSoft)"/>
+      <path d="M4.4,-9.5 C4,-19 7,-17 5,-9 Z" fill="#F8C9C2" filter="url(#srSoft)"/>
+      <ellipse cx="0" cy="14" rx="9.5" ry="8" fill="url(#srFur)" stroke="#E3CDB7" stroke-width="1.2"/>
+      <circle cx="0" cy="0" r="9" fill="url(#srFur)" stroke="#E3CDB7" stroke-width="1.2"/>
+      <circle cx="-3.2" cy="-0.5" r="1.3" fill="#3E2E1E"/><circle cx="3.2" cy="-0.5" r="1.3" fill="#3E2E1E"/>
+      <circle cx="-2.8" cy="-0.9" r=".45" fill="#FFF"/><circle cx="3.6" cy="-0.9" r=".45" fill="#FFF"/>
+      <circle cx="-5.6" cy="2.4" r="1.7" fill="#F8C9C2" filter="url(#srSoft)"/>
+      <circle cx="5.6" cy="2.4" r="1.7" fill="#F8C9C2" filter="url(#srSoft)"/>
+      <ellipse cx="0" cy="1.8" rx=".8" ry=".6" fill="#F09A93"/>
+      <path d="M-1.5,3.4 q.75,.9 1.5,0 q.75,.9 1.5,0 M0,3.4 v-1.3" stroke="#A98770" stroke-width=".7" fill="none" stroke-linecap="round"/>
+      <ellipse cx="-7.5" cy="12" rx="2.6" ry="1.8" fill="#FFFFFF" stroke="#E3CDB7" stroke-width="1"/>
+    </g>
+  </svg>
+</div>
+<div id="usaGuide" aria-live="polite">①テーマをきめる → ②プロンプトをコピー → ③とりこむ、の順でどうぞ。まよったら🎁サンプルで体験できます！</div>
+</div>
+
+<main>
+
+<!-- ===== 設定 ===== -->
+<section id="tab-setting" class="tab active">
+  <h2>研修テーマの設定</h2>
+  <details class="step" open style="border-left-color:var(--mush);">
+    <summary>📖 はじめての方へ — ツール全体の使い方（1分）</summary>
+    <div class="inner">
+      <b>これは何？</b>　受講生の質問に即答するための「想定質問集」を、作る・引く・育てる単一HTMLツールです。文系には<b>たとえ</b>で、理系には<b>技術</b>で答え分けます。たとえの世界観はデフォルトで<b>うさうさラーメン店🍜</b>（①で変更可・全問で1つに統一が鉄則）。<br><br>
+      <b>基本の流れ（タブの番号どおり）</b><br>
+      ① 🏠 テーマと世界観をきめる → ② 🤖 プロンプトをAIへ（🚀一気通貫／📚時短100問なら取り込みまで自動） → ③ 📥 JSONやExcelを取り込む → ④ ✏️ 技術レビューと追記 → ⑤ 🔍 当日はキーワード検索 → ⑥ ⚡ ふわっとした質問は仮説と30秒レシピ → ⑦ 🗂 出た質問を記録して⭐昇格 → ⑧ 📦 当日課題のサポート資料 → ⑨ 📤 Excel／JSONで持ち帰り → ⑩ 🧭 折り返しで中間チェック。<br><br>
+      <b>はじめ方は3つ</b>：🎁 下の「サンプル一式で試す」（30秒で全機能体験）／📚 ②タブの時短100問（資料かキーワードから一気に）／📗 ③タブにお手持ちの想定質問集Excelをそのまま読み込み。<br><br>
+      <b>AI接続</b>はページ右上で3モード（☁️Claude内＝キー不要／🔑APIキー＝ローカル用／✍️手動コピペ）。<b>うさうさの約束</b>：理系向け回答と参考記事URLの最終レビューは人間の仕事・固有名詞や個人情報は入れない・今日出た質問は今日のうちに追記🐰
+    </div>
+  </details>
+  <details class="step"><summary>📖 このタブの使い方</summary><div class="inner">
+    研修テーマ・たとえの世界観・カテゴリを入れて保存すると、🤖AIプロンプトに自動反映されます。<b>世界観は1つに統一</b>が鉄則。何もないときは「🎁 サンプル一式」で全タブを即体験できます🐰
+  </div></details>
+  <div class="note">🐰 ここで決めた内容が <b>AIプロンプト</b> に自動で埋め込まれます。たとえの世界観は<b>1つに統一</b>するのがコツです（質問ごとにバラバラだと、受講生の頭の中で絵がつながりません）。</div>
+  <div class="row2">
+    <div>
+      <label>研修テーマ（演習名）</label>
+      <input type="text" id="inTheme" placeholder="例：クラウドインフラ設計演習（AWS）">
+    </div>
+    <div>
+      <label>たとえの世界観（全問で統一）</label>
+      <input type="text" id="inWorld" placeholder="デフォルト：うさうさラーメン店🍜（変えるなら1つに統一）">
+    </div>
+  </div>
+  <div class="row2">
+    <div>
+      <label>カテゴリ（読点・カンマ区切り、6〜8個推奨）</label>
+      <input type="text" id="inCats" placeholder="例：VPC・サブネット, AZ・可用性, ELB, EC2, RDS, セキュリティ, 構成図">
+    </div>
+    <div>
+      <label>質問数の目安</label>
+      <select id="inCount">
+        <option value="30〜40">30〜40問（半日研修）</option>
+        <option value="60〜70" selected>60〜70問（標準）</option>
+        <option value="80〜100">80〜100問（複数日）</option>
+      </select>
+    </div>
+  </div>
+  <label>受講生の前提・補足（任意）</label>
+  <textarea id="inMemo" rows="3" placeholder="例：文系・未経験7割。前章でセキュリティ基礎を学習済み。発表会あり。"></textarea>
+  <div class="btn-row">
+    <button class="btn btn-main" onclick="saveSettings();go('tab-prompt')">設定を保存して プロンプト生成へ →</button>
+    <button class="btn btn-sub" onclick="loadSampleAll()">🎁 何もないときはコレ：サンプル一式で試す</button>
+  </div>
+
+  <h3>📖 このツールの使い方（3分）</h3>
+  <details class="step"><summary>STEP 1：設定 → AIプロンプトをコピー</summary><div class="inner">上の設定を入力し、「🤖 AIプロンプト」タブのプロンプトをコピーしてAI（Claudeなど）に送ります。質問・回答の中身はAIに作ってもらいます。</div></details>
+  <details class="step"><summary>STEP 2：AIの出力（JSON）をインポート</summary><div class="inner">AIが返したJSONを「📥 インポート」タブに貼り付けて読み込みます。読み込んだ内容はすぐ検索・編集できます。</div></details>
+  <details class="step"><summary>STEP 3：自分の手で直す（ここが品質の分かれ目）</summary><div class="inner">「✏️ 編集」タブでセルを直接クリックして書き換えられます。<b>理系向け回答の技術的な正確性レビューだけは人間の仕事</b>です🐰 研修当日に出た質問も、その日のうちに追記しましょう。</div></details>
+  <details class="step"><summary>STEP 4：保存・Excel出力</summary><div class="inner">「📤 保存・出力」からJSON（このツール用の保存形式）とExcel（5シート構成・検索数式入り）を出力できます。ブラウザにも自動保存されます（対応環境のみ）。</div></details>
+</section>
+
+<!-- ===== AIプロンプト ===== -->
+<section id="tab-prompt" class="tab">
+  <h2>AIプロンプト自動生成</h2>
+  <details class="step"><summary>📖 このタブの使い方</summary><div class="inner">
+    📋コピーしてAIに送るだけ。プロンプトは<b>直接編集でき、自動保存</b>されます（JSONバックアップにも含む）。設定を変えたら「🔄 設定から再生成」。💾md／🖨PDF／📑CSVで持ち出せて、🔍内検索で一致行へジャンプできます🐰
+  </div></details>
+  <div class="note">🐰 設定タブの内容を反映したプロンプトです。<b>そのままコピーしてAIに送信</b>→ 返ってきたJSONを「📥 インポート」へ。<br>AIはとても優秀ですが、細かい仕様はしれっと間違えます。<b>生成後のレビューは必ず自分の目で</b>。</div>
+  <h3>🔍 プロンプト内検索（このタブの2つのプロンプトから）</h3>
+  <input type="text" id="promptSearch" placeholder="🔍 キーワードを入力（例：keywords、世界観、JSON）— 一致箇所へジャンプできます">
+  <div class="hit-count" id="promptSearchCount" style="display:none;"></div>
+  <div id="promptSearchResults"></div>
+  <div class="btn-row">
+    <button class="btn btn-sub btn-mini" onclick="downloadPromptsExcel()">📊 Excelで保存（2つまとめて・プロンプト台帳）</button>
+    <button class="btn btn-sub btn-mini" onclick="downloadPromptsCsv()">📑 CSVで保存（2つまとめて）</button>
+  </div>
+
+  <h3>① 新規作成用（JSONで受け取る → このツールに取り込み）</h3>
+  <div class="btn-row">
+    <button class="btn btn-main" onclick="copyText('promptNew')">📋 プロンプトをコピー</button>
+    <button class="btn btn-gold" onclick="regenPrompt('new')">🔄 設定から再生成（編集を破棄）</button>
+    <button class="btn btn-sub" onclick="loadSampleMeta()">🎁 サンプル設定を入れて見本を見る</button>
+    <button class="btn btn-sub btn-mini" onclick="downloadPromptMd('new')">💾 メモ（.md）で保存</button>
+    <button class="btn btn-sub btn-mini" onclick="downloadPromptPdf('new')">🖨 PDFに保存（印刷）</button>
+  </div>
+  <div class="save-pill" id="promptNewStatus" style="margin-bottom:6px;"></div>
+  <textarea class="prompt-box" id="promptNew" spellcheck="false"></textarea>
+  <h3>② 既存Excelを横展開する場合（Excel添付ルート）</h3>
+  <div class="note">手元に既存の想定質問集Excelがあるなら、AIにExcelごと添付してこちらを送るのが最速です。</div>
+  <div class="btn-row">
+    <button class="btn btn-main" onclick="copyText('promptExcel')">📋 Excel添付用プロンプトをコピー</button>
+    <button class="btn btn-gold" onclick="regenPrompt('excel')">🔄 設定から再生成（編集を破棄）</button>
+    <button class="btn btn-sub btn-mini" onclick="downloadPromptMd('excel')">💾 メモ（.md）で保存</button>
+    <button class="btn btn-sub btn-mini" onclick="downloadPromptPdf('excel')">🖨 PDFに保存（印刷）</button>
+  </div>
+  <div class="save-pill" id="promptExcelStatus" style="margin-bottom:6px;"></div>
+  <textarea class="prompt-box" id="promptExcel" spellcheck="false"></textarea>
+
+  <h2 style="margin-top:28px;">🚀 一気通貫 — このプロンプトでAIに作らせて → 取り込み → 確認 → 出力</h2>
+  <div class="note">🐰 上の<b>①新規作成用プロンプト（編集版があればその内容）</b>をそのままAIに送り、返ってきたJSONを<b>自動で取り込み</b>ます。取り込み後はこの場でミニ検索して中身を確認し、ExcelやJSONをダウンロードできます。AI接続はページ上部のモード（☁️Claude内／🔑APIキー）を使います。<b>フル生成は数分かかることがある</b>ので、まずはお試し10問がおすすめです。</div>
+  <div class="row2">
+    <div>
+      <label>質問数</label>
+      <select id="pipeCount">
+        <option value="10">🎈 お試し10問（はやい・まず動作確認）</option>
+        <option value="30">30問</option>
+        <option value="">プロンプトの指定どおり（フル）</option>
+      </select>
+    </div>
+    <div>
+      <label>取り込み方法</label>
+      <select id="pipeApply">
+        <option value="replace">置き換え（DBを作り直す）</option>
+        <option value="append">追記（既存に追加）</option>
+      </select>
+    </div>
+  </div>
+  <div class="btn-row">
+    <button class="btn btn-main" onclick="runPipeline()">🚀 一気通貫で実行</button>
+  </div>
+  <div id="pipeStatus" class="note" style="display:none;"></div>
+  <div id="pipeVerify" style="display:none;">
+    <h3>🔍 取り込み結果をその場で検索チェック</h3>
+    <input type="text" id="pipeSearch" class="search-big" placeholder="🔍 キーワードで中身を確認（例：なぜ、図解、レベル名）">
+    <div class="hit-count" id="pipeHit"></div>
+    <div id="pipeResults"></div>
+    <div class="btn-row">
+      <button class="btn btn-main" onclick="exportExcel()">📊 そのままExcel出力（.xlsx・数式入り）</button>
+      <button class="btn btn-gold" onclick="exportJSON()">💾 JSONで保存</button>
+      <button class="btn btn-sub" onclick="go('tab-edit')">✏️ 編集タブでレビューする →</button>
+    </div>
+  </div>
+
+  <h2 style="margin-top:28px;">📚 時短100問ジェネレーター — 資料 or キーワードから一気に</h2>
+  <div class="note">🐰 <b>受講生に学んでほしい資料</b>（テキスト/md）を読み込ませるか、<b>キーワードだけ</b>入れて実行すると、想定質問集を最大100問つくって自動で取り込みます。100問は<b>前半・後半の2回に分けて生成</b>するので途切れにくい設計。終わったら下のボタンで<b>検索Excel（Sheets対応）とNotion用md</b>まで一気にどうぞ。理系向け回答と参考記事URLの最終レビューは人間の仕事です！</div>
+  <label>📄 資料を貼り付け（任意：研修テキスト・手順書・スライド原稿など）</label>
+  <textarea id="srcText" rows="5" placeholder="ここに資料本文を貼り付け（長い場合は先頭から約6000字を使用します）"></textarea>
+  <div class="row2">
+    <div>
+      <label>📎 またはファイルを読み込む（.txt / .md）</label>
+      <input type="file" id="srcFile" accept=".txt,.md,text/plain,text/markdown" style="font-size:.85rem;">
+    </div>
+    <div>
+      <label>🔑 またはキーワードだけ（カンマ区切り）</label>
+      <input type="text" id="srcKeywords" placeholder="例：DNS, BIND, ゾーン, レコード, トラブルシュート">
+    </div>
+  </div>
+  <div class="row2">
+    <div>
+      <label>問題数</label>
+      <select id="srcCount">
+        <option value="10">🎈 お試し10問</option>
+        <option value="30">30問</option>
+        <option value="60">60問（2回に分けて生成）</option>
+        <option value="100" selected>💯 100問（2回に分けて生成）</option>
+      </select>
+    </div>
+    <div>
+      <label>取り込み方法</label>
+      <select id="srcApply">
+        <option value="replace">置き換え（DBを作り直す）</option>
+        <option value="append">追記（既存に追加）</option>
+      </select>
+    </div>
+  </div>
+  <div class="btn-row">
+    <button class="btn btn-main" onclick="runSourceGen()">📚 時短生成スタート</button>
+  </div>
+  <div id="srcStatus" class="note" style="display:none;"></div>
+  <div class="prompt-box" id="srcPrompt" style="display:none;"></div>
+  <div class="btn-row" id="srcPromptRow" style="display:none;">
+    <button class="btn btn-sub" onclick="copyText('srcPrompt')">📋 このプロンプトをコピーしてAIへ</button>
+  </div>
+  <div id="srcDone" style="display:none;">
+    <div class="btn-row">
+      <button class="btn btn-main" onclick="exportExcel()">📊 検索Excelを出力（.xlsx／Sheets対応）</button>
+      <button class="btn btn-gold" onclick="downloadDbNotionMd()">📝 Notion用マークダウンを出力</button>
+      <button class="btn btn-sub" onclick="go('tab-search')">🔍 検索タブで動作確認 →</button>
+    </div>
+  </div>
+</section>
+
+<!-- ===== インポート ===== -->
+<section id="tab-import" class="tab">
+  <h2>インポート（AIのJSON ／ Excelそのまま どちらでも）</h2>
+  <details class="step"><summary>📖 このタブの使い方</summary><div class="inner">
+    <b>ルートA（AIから）</b>：AIが返したJSONを下の欄に貼って「読み込む」。```json囲み付きでもOK。<br>
+    <b>ルートB（Excelから）</b>：既存の想定質問集Excel（5シート構成）をそのまま選ぶだけで解析→「置き換え」か「追記」を選んで反映。<br>
+    どちらも読み込み後は「🔍 検索」での動作確認と「✏️ 編集」での技術レビューをお忘れなく🐰
+  </div></details>
+
+  <h3>📗 ルートB：Excelファイルをそのまま読み込む</h3>
+  <div class="note">5シート構成（検索／質問集DB／議論質問／発展／ヒント）のExcel（.xlsx）に対応。数式列（検索用・ヒット）は無視されるので、出力したExcelをそのまま戻すこともできます。</div>
+  <input type="file" id="xlsxFile" accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" style="font-size:.85rem;">
+  <div class="btn-row" id="xlsxApplyRow" style="display:none;">
+    <button class="btn btn-main" onclick="applyXlsx(false)">📗 反映する（置き換え）</button>
+    <button class="btn btn-gold" onclick="applyXlsx(true)">➕ 追記する（既存に追加）</button>
+  </div>
+
+  <h3>🤖 ルートA：AI出力（JSON）の貼り付け</h3>
+  <div class="note">🐰 AIが返したJSONを丸ごと貼り付けてください。<b>```json などの囲みが付いたままでもOK</b>（自動で取り除きます）。</div>
+  <textarea id="importArea" rows="12" placeholder='{ "meta": {...}, "questions": [...], ... } をここに貼り付け'></textarea>
+  <div class="btn-row">
+    <button class="btn btn-main" onclick="doImport(false)">📥 読み込む（置き換え）</button>
+    <button class="btn btn-gold" onclick="doImport(true)">➕ 追記する（既存に追加）</button>
+    <button class="btn btn-sub" onclick="insertSampleImport()">🎁 サンプルJSONを貼り付け欄に入れる</button>
+    <button class="btn btn-sub" onclick="document.getElementById('importArea').value=''">クリア</button>
+  </div>
+  <div class="import-status" id="importStatus"></div>
+  <h3>AI生成後のチェックリスト</h3>
+  <div class="note">
+    ☑ 検索タブでキーワードを入れて、件数と一覧が出るか<br>
+    ☑ たとえの世界観が全問で統一されているか<br>
+    ☑ 理系向け回答に技術的な誤りがないか（公式ドキュメントと照合）<br>
+    ☑ 固有名詞・個人情報が混入していないか
+  </div>
+</section>
+
+<!-- ===== 編集 ===== -->
+<section id="tab-edit" class="tab">
+  <h2>編集（セルを直接クリックして書き込み）</h2>
+  <details class="step"><summary>📖 このタブの使い方</summary><div class="inner">
+    セルをクリックでその場編集・自動保存。「＋追加」で新しい行、レベルはプルダウン。<b>当日出た質問はその日のうちに追記</b>——これが最強FAQへの近道です。空のときは各表の🎁サンプルから🐰
+  </div></details>
+  <div class="note">🐰 セルをクリックするとその場で編集できます。変更は自動でツール内に反映されます。研修で実際に出た質問は<b>終わったその日に追記</b>——繰り返すと、あなただけの最強FAQに育ちます。</div>
+
+  <div class="section-head"><h3>📚 質問集DB</h3>
+    <button class="btn btn-main btn-mini" onclick="addRow('questions')">＋ 質問を追加</button></div>
+  <div class="editor-wrap"><table class="editor" id="tblQ"></table></div>
+
+  <div class="section-head"><h3>💬 議論質問（質問→誘導→期待する解答）</h3>
+    <button class="btn btn-main btn-mini" onclick="addRow('discussions')">＋ 追加</button></div>
+  <div class="editor-wrap"><table class="editor" id="tblD"></table></div>
+
+  <div class="section-head"><h3>🚀 発展（どこに何を足すか）</h3>
+    <button class="btn btn-main btn-mini" onclick="addRow('advanced')">＋ 追加</button></div>
+  <div class="editor-wrap"><table class="editor" id="tblA"></table></div>
+
+  <div class="section-head"><h3>💡 ヒント（上段：受講生に見せてよい）</h3>
+    <button class="btn btn-main btn-mini" onclick="addRow('hints')">＋ 追加</button></div>
+  <div class="editor-wrap"><table class="editor" id="tblH"></table></div>
+
+  <div class="section-head"><h3>🤫 段階ヒント（下段：講師専用）</h3>
+    <button class="btn btn-main btn-mini" onclick="addRow('instructorHints')">＋ 追加</button></div>
+  <div class="editor-wrap"><table class="editor" id="tblI"></table></div>
+</section>
+
+<!-- ===== 検索 ===== -->
+<section id="tab-search" class="tab">
+  <h2>クイック検索（部分一致・大文字小文字区別なし）</h2>
+  <details class="step"><summary>📖 このタブの使い方</summary><div class="inner">
+    黄色の枠にキーワードを入れるだけ（Excelの黄色セルと同じ感覚・部分一致・ハイライト付き）。「ec2」でも「EC2」でもヒット。ヒットしないときはDBのキーワード列に同義語を足しましょう🐰
+  </div></details>
+  <input type="text" id="searchBox" class="search-big" placeholder="🔍 キーワードを入力（例：レプリカ、ec2、なぜ）">
+  <div class="hit-count" id="hitCount"></div>
+  <div id="searchResults"></div>
+</section>
+
+<!-- ===== 即答アシスタント ===== -->
+<section id="tab-assist" class="tab">
+  <h2>⚡ 即答アシスタント — ふわっとした質問から仮説を立てる</h2>
+  <details class="step"><summary>📖 このタブの使い方</summary><div class="inner">
+    上段＝受講生の質問をそのまま入れて「🐰仮説を立てる」（DBから候補・オフライン）。下段＝<b>⏱30秒レシピはDBが空でもOK</b>：仮説・レベルを選ぶとステップバイステップ解説＋文系/理系の答え方＋参考記事まで生成。AI接続はページ上部のモード（☁️Claude内／🔑APIキー／✍️手動）で切り替え🐰
+  </div></details>
+  <div class="note">🐰 受講生の質問って、正式名称では来ません。「なんかコピーされるやつ」「あの黄色いの」——そんな<b>ふわっとした質問をそのまま入力</b>すると、質問集DBから「本当はこれを聞きたいのかも？」という<b>仮説</b>を確からしい順に提示します。<br><b>仮説はあくまで仮説</b>。受講生に逆質問で確認してから答えましょう（事実と所感を分ける🐰）。</div>
+  <label>受講生の質問（ふわっとでOK・そのままの言葉で）</label>
+  <textarea id="assistInput" rows="2" placeholder="例：「サーバーが増えるやつって、勝手に減ったりもするんですか？」"></textarea>
+  <div class="btn-row">
+    <button class="btn btn-main" onclick="runAssist()">🐰 仮説を立てる（オフライン）</button>
+    <button class="btn btn-gold" onclick="askAI()">🤖 AIに答え方を相談（オンライン時）</button>
+    <button class="btn btn-sub btn-mini" onclick="insertSampleAssist()">🎁 サンプル質問で試す</button>
+  </div>
+  <div id="assistResults"></div>
+  <div id="aiArea" style="display:none;">
+    <h3>🤖 AI相談</h3>
+    <div id="aiStatus" class="note" style="display:none;"></div>
+    <div class="prompt-box" id="aiOut" style="display:none;"></div>
+    <div class="btn-row" id="aiCopyRow" style="display:none;">
+      <button class="btn btn-sub" onclick="copyText('aiOut')">📋 このプロンプトをコピーしてAIへ</button>
+    </div>
+  </div>
+
+  <h2 style="margin-top:28px;">⏱ 30秒ティーチングレシピ — <b>DBがなくてもOK</b></h2>
+  <div class="note">🐰 想定質問集を<b>インポートしていなくても</b>使えます。新人さん（受講生）のふわっとした質問と、あなたの仮説（任意）を打ち込むと、<b>仮説確認 → レベル別ステップバイステップ解説 → 文系のたとえ／理系の技術 → 受講生にシェアできる参考記事</b>まで、30秒で読めるレシピを作ります。</div>
+  <label>あなたの仮説（任意：「たぶん○○のことを聞いている」）</label>
+  <textarea id="recipeHypo" rows="2" placeholder="例：たぶんAuto Scalingの縮退（スケールイン）のことを聞いている気がする"></textarea>
+  <div class="row2">
+    <div>
+      <label>受講生のレベル</label>
+      <select id="recipeLevel">
+        <option value="初級（IT未経験・文系出身を含む）">🟢 初級（未経験・文系含む）</option>
+        <option value="中級（基礎は理解している）">🔵 中級（基礎は理解）</option>
+        <option value="上級（実務経験あり・理系）">🔴 上級（実務経験あり）</option>
+        <option value="不明（まず様子を見たい）">🌫 不明（様子見）</option>
+      </select>
+    </div>
+    <div>
+      <label>解説のステップ数のめやす</label>
+      <select id="recipeSteps">
+        <option value="3">さくっと3ステップ</option>
+        <option value="5" selected>標準5ステップ</option>
+        <option value="7">じっくり7ステップ</option>
+      </select>
+    </div>
+  </div>
+  <div class="btn-row">
+    <button class="btn btn-main" onclick="makeRecipe()">⏱ 30秒レシピを作る</button>
+    <button class="btn btn-sub" onclick="showRefLinks()">🔗 参考記事の検索リンクだけ作る（オフライン）</button>
+  </div>
+  <div id="recipeStatus" class="note" style="display:none;"></div>
+  <div id="recipeOut" class="card" style="display:none;"></div>
+  <div class="btn-row" id="recipeShareRow" style="display:none;">
+    <button class="btn btn-gold" onclick="copyRecipeShare()">📨 受講生に渡す用にコピー（回答＋参考記事）</button>
+  </div>
+  <div class="prompt-box" id="recipePrompt" style="display:none;"></div>
+  <div class="btn-row" id="recipePromptRow" style="display:none;">
+    <button class="btn btn-sub" onclick="copyText('recipePrompt')">📋 このプロンプトをコピーしてAIへ</button>
+  </div>
+  <div id="refLinksOut" style="display:none;"></div>
+</section>
+
+<!-- ===== レッスン記録（前＝準備／後＝実績） ===== -->
+<section id="tab-lesson" class="tab">
+  <h2>🗂 レッスン記録 — 新卒研修の質問・課題管理</h2>
+  <details class="step"><summary>📖 このタブの使い方</summary><div class="inner">
+    <b>🌅 レッスン前</b>＝出そうな質問と準備物を計画して「準備シートmd」に。<b>🌙 レッスン後</b>＝実際に出た質問をクイック記録（ID自動採番）し、<b>⭐ボタンで想定質問集DBへ昇格</b>——「当日出た質問はその日のうちに追記」をワンタップにしました。実績は「実績レポートmd（Notion貼り付け用）」とExcelの質問ログシートに出力できます🐰
+  </div></details>
+
+  <h3>📋 レッスン情報（前後共通）</h3>
+  <div class="row2">
+    <div><label>実施日</label><input type="text" id="lsDate" placeholder="YYYY/MM/DD"></div>
+    <div><label>章・単元テーマ</label><input type="text" id="lsTheme" placeholder="例：3.5b クラウドインフラ設計演習"></div>
+  </div>
+  <div class="row2">
+    <div><label>クラス・受講生構成（任意）</label><input type="text" id="lsCohort" placeholder="例：新卒20名・文系7割"></div>
+    <div><label>メモ（任意）</label><input type="text" id="lsMemo" placeholder="例：発表会あり／進行はメイン講師の指示に従う"></div>
+  </div>
+
+  <div class="btn-row" style="margin-top:18px;">
+    <button class="btn btn-main" id="modePre" onclick="lessonMode('pre')">🌅 レッスン前（準備）</button>
+    <button class="btn btn-sub" id="modePost" onclick="lessonMode('post')">🌙 レッスン後（実績）</button>
+    <button class="btn btn-gold" onclick="downloadLessonExcel()">📊 レッスン記録をExcelでダウンロード（.xlsx・4シート）</button>
+  </div>
+
+  <div id="lessonPre">
+    <h3>🌅 出そうな質問と準備の計画</h3>
+    <div class="note">想定質問集DBが育っていれば、🔍検索で同じ単元の過去質問を引いてからここに計画を書くのが近道です。レベルと文系/理系を決めておくと、当日のヒント小出しがスムーズ🐰</div>
+    <div class="section-head"><span></span><button class="btn btn-main btn-mini" onclick="addRow('preplan')">＋ 計画を追加</button></div>
+    <div class="editor-wrap"><table class="editor" id="tblPre"></table></div>
+    <h3>✅ 事前チェックリスト</h3>
+    <div class="note">
+      <label style="display:block;margin:3px 0;"><input type="checkbox"> 想定質問集DBをこの単元のキーワードで検索して中身を確認した</label>
+      <label style="display:block;margin:3px 0;"><input type="checkbox"> ヒントの小出し順（考え方→経路→ほぼ答え）を準備した</label>
+      <label style="display:block;margin:3px 0;"><input type="checkbox"> 文系向けのたとえが世界観で統一されているか見直した</label>
+      <label style="display:block;margin:3px 0;"><input type="checkbox"> 参考記事のリンクが開けるか確認した</label>
+      <label style="display:block;margin:3px 0;"><input type="checkbox"> 進行・回答方針をメイン講師と確認した</label>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-gold" onclick="downloadLessonPreMd()">💾 準備シートmdを保存（Notion貼り付け用）</button>
+    </div>
+  </div>
+
+  <div id="lessonPost" style="display:none;">
+    <h3>🌙 クイック記録（出た質問をその場で）</h3>
+    <label>出た質問（そのままの言葉で）</label>
+    <textarea id="qkQuestion" rows="2" placeholder="例：サーバーが増えるやつって、勝手に減ったりもするんですか？"></textarea>
+    <div class="row2">
+      <div><label>質問した受講生</label>
+        <select id="qkTarget"><option>文系</option><option>理系</option><option selected>不明</option></select></div>
+      <div><label>レベル感</label>
+        <select id="qkLevel"><option selected>初級</option><option>中級</option><option>上級</option><option>発表</option></select></div>
+    </div>
+    <label>答えた内容・対応（あとで書いてもOK）</label>
+    <textarea id="qkAnswer" rows="2" placeholder="例：商店街の出店ルールのたとえで説明。スケールインも自動と回答。"></textarea>
+    <div class="row2">
+      <div><label>ステータス</label>
+        <select id="qkStatus"><option>✅ 即答</option><option>🔵 宿題</option><option>🟡 確認待ち</option><option>🔴 エスカレ</option><option selected>📥 保留</option></select></div>
+      <div><label>　</label>
+        <button class="btn btn-main" style="width:100%;" onclick="quickLog()">📝 記録する（ID自動採番）</button></div>
+    </div>
+
+    <div class="section-head"><h3>🗂 質問ログ（⭐＝想定質問集DBへ昇格）</h3>
+      <span class="save-pill" id="logSummary"></span></div>
+    <div class="editor-wrap"><table class="editor" id="tblLog"></table></div>
+    <div class="btn-row">
+      <button class="btn btn-gold" onclick="downloadLessonPostMd()">💾 実績レポートmdを保存（Notion貼り付け用）</button>
+      <button class="btn btn-sub" onclick="exportExcel()">📊 Excel出力（質問ログシート入り）</button>
+    </div>
+    <div class="note">🆔 採番ルール：✅即答=DN／🔵宿題=WI／🟡確認待ち=RV／🔴エスカレ=ES／📥保留=BL（各001から連番）。<b>エスカレの一次報告先はメイン講師</b>——サブ講師は単独判断しない、がうさうさの約束です🐰</div>
+  </div>
+</section>
+
+<!-- ===== 記事工房 ===== -->
+<section id="tab-article" class="tab">
+  <h2>📰 記事工房 — 「想定質問集Excelの作り方」をツールに</h2>
+  <details class="step"><summary>📖 このタブの使い方</summary><div class="inner">
+    元記事『想定質問集Excelの作り方』を<b>そのまま道具に</b>したコーナーです。①記事リーダー（コピー・md保存）、②記事の数式をあなたの行数に合わせて作る<b>数式ジェネレーター</b>（手組み派・トラブル対応用）、③AI生成後チェックリスト。手で一度組んでおくと、AI製の修正もできるようになります🐰
+  </div></details>
+
+  <h3>🧮 Excel数式ジェネレーター（記事Step1・2の心臓部を自分サイズで）</h3>
+  <div class="note">データの<b>行数</b>と<b>列フォーマット</b>を選ぶと、記事の4つの数式をその場で生成します。手動でExcelを組むときや、AI製Excelの数式が壊れたときの修理にどうぞ。</div>
+  <div class="row2">
+    <div>
+      <label>質問データの行数（ヘッダー除く）</label>
+      <input type="text" id="fxRows" value="70" inputmode="numeric">
+    </div>
+    <div>
+      <label>列フォーマット</label>
+      <select id="fxFormat">
+        <option value="classic">記事オリジナル（〜G列キーワード／H検索用・Iヒット）</option>
+        <option value="ref">参考記事2列入り（〜I列／J検索用・Kヒット）</option>
+      </select>
+    </div>
+  </div>
+  <div class="btn-row"><button class="btn btn-main btn-mini" onclick="genFormulas()">🧮 数式を生成</button></div>
+  <div id="fxOut"></div>
+
+  <h3>✅ AI生成後チェックリスト（記事より）</h3>
+  <div class="note" id="artCheck">
+    <label style="display:block;margin:4px 0;"><input type="checkbox"> 検索シートでキーワードを入れて、件数と一覧が出るか</label>
+    <label style="display:block;margin:4px 0;"><input type="checkbox"> たとえの世界観が全問で統一されているか</label>
+    <label style="display:block;margin:4px 0;"><input type="checkbox"> 理系向け回答に技術的な誤りがないか（公式ドキュメントと照合）</label>
+    <label style="display:block;margin:4px 0;"><input type="checkbox"> 参考記事のURLが実在するか（リンクを開いて確認）</label>
+    <label style="display:block;margin:4px 0;"><input type="checkbox"> 固有名詞・個人情報が混入していないか</label>
+  </div>
+
+  <h3>📖 記事リーダー（全文）</h3>
+  <div class="btn-row">
+    <button class="btn btn-main btn-mini" onclick="copyArticle()">📋 記事を全文コピー</button>
+    <button class="btn btn-sub btn-mini" onclick="downloadArticleMd()">💾 メモ（.md）で保存</button>
+  </div>
+  <details class="step"><summary>記事を開く：🐰研修講師の味方「想定質問集Excel」の作り方</summary>
+    <div class="inner" id="articleBody" style="line-height:1.9;"></div>
+  </details>
+</section>
+
+<!-- ===== 当日資料工房 ===== -->
+<section id="tab-ws" class="tab">
+  <h2>📦 当日資料工房 — 課題・ワークショップのサポート資料を即席で</h2>
+  <details class="step"><summary>📖 このタブの使い方</summary><div class="inner">
+    <b>メイン講師から当日「この課題やります」「追加問題を出します」と指示が来たとき用</b>。下の入力セクションで問題ごとに「想定質問→ヒント（考え方）→誘導（経路）→答え（🍡文系のたとえ／⚙️理系の技術）」をレベル別に登録すると、講師用サポート資料を<b>txt／md／PDF</b>で即出力できます。答えはヒント1→誘導→答えの順に小出しが鉄則。資料は講師用——受講生への開示範囲はメイン講師に確認を🐰
+  </div></details>
+
+  <h3>📋 当日情報</h3>
+  <div class="row2">
+    <div><label>課題・ワークショップ名</label><input type="text" id="wsName" placeholder="例：3.5b 追加ワーク：障害シナリオ演習"></div>
+    <div><label>対象（クラス・レベル感）</label><input type="text" id="wsTarget" placeholder="例：新卒20名・文系7割・演習後半組"></div>
+  </div>
+  <label>メイン講師の当日指示（そのままメモ）</label>
+  <textarea id="wsDirective" rows="2" placeholder="例：基本課題が早く終わった人向けに追加問題2問。ヒントは段階的に、答えは最後まで見せない。"></textarea>
+
+  <h3>📝 入力セクション — 問題をクイック追加</h3>
+  <div class="row2">
+    <div><label>種別</label><select id="wkKind"><option selected>基本</option><option>追加</option></select></div>
+    <div><label>レベル</label><select id="wkLevel"><option selected>初級</option><option>中級</option><option>上級</option><option>発表</option></select></div>
+  </div>
+  <label>課題・問題（タイトルや問題文）</label>
+  <textarea id="wkTitle" rows="2" placeholder="例：AZ-aが全滅したとき、サービスはどうなる？構成図で説明せよ"></textarea>
+  <label>想定質問（受講生からの出そうな聞かれ方）</label>
+  <input type="text" id="wkExpectQ" placeholder="例：全滅って、何が残ってれば動くんですか？">
+  <div class="row2">
+    <div><label>ヒント（考え方）</label><input type="text" id="wkHint" placeholder="例：お客さまのリクエストを入口から順に追う"></div>
+    <div><label>誘導（経路・詰まったら）</label><input type="text" id="wkGuide" placeholder="例：ELBのヘルスチェック→残るAZ→RDSの順に確認"></div>
+  </div>
+  <div class="row2">
+    <div><label>答え：🍡文系（たとえで）</label><input type="text" id="wkAnsB" placeholder="例：片方の建物が停電しても案内係が支店へ通すので営業継続"></div>
+    <div><label>答え：⚙️理系（技術で）</label><input type="text" id="wkAnsR" placeholder="例：ELBが異常AZを切り離し、RDSはスタンバイへフェイルオーバー"></div>
+  </div>
+  <div class="btn-row">
+    <button class="btn btn-main" onclick="quickWs()">📦 この問題を追加</button>
+    <button class="btn btn-sub btn-mini" onclick="insertSampleWs()">🎁 サンプルを入れる</button>
+  </div>
+
+  <div class="section-head"><h3>🗃 登録済みの問題（直接編集OK）</h3>
+    <button class="btn btn-main btn-mini" onclick="addRow('ws')">＋ 空行を追加</button></div>
+  <div class="editor-wrap"><table class="editor" id="tblWs"></table></div>
+
+  <h3>📤 資料の出力（講師用）</h3>
+  <div class="btn-row">
+    <button class="btn btn-sub" onclick="downloadWsTxt()">💾 資料メモ（.txt）</button>
+    <button class="btn btn-gold" onclick="downloadWsMd()">💾 マークダウン（.md／Notion用）</button>
+    <button class="btn btn-main" onclick="printWsPdf()">🖨 PDFに保存（印刷）</button>
+  </div>
+</section>
+
+<!-- ===== PDCA中間チェックポイント ===== -->
+<section id="tab-pdca" class="tab">
+  <h2>🧭 PDCA中間チェックポイント — 研修の折り返しを見える化</h2>
+  <details class="step"><summary>📖 このタブの使い方</summary><div class="inner">
+    研修期間の<b>中間（折り返し）で立ち止まって確認する</b>ためのシートです。🅿計画した目標 → 🅳やったこと → 🅲評価（<b>Good＝よかった点／More＝のびしろ</b>の2本立て・進捗は％の数値で見える化）→ 🅰次の一手、の順に書きます。mdで出力すればそのままNotionの振り返りページに。<b>評価は事実ベース、所感はMoreに</b>——が、うさうさの約束です🐰
+  </div></details>
+
+  <h3>📋 チェックポイント情報</h3>
+  <div class="row2">
+    <div><label>実施回</label><input type="text" id="pcRound" placeholder="例：第1回（研修3週目）"></div>
+    <div><label>対象期間</label><input type="text" id="pcPeriod" placeholder="例：2026/05/07〜2026/06/06"></div>
+  </div>
+  <label>この研修のゴール（最終目標）</label>
+  <input type="text" id="pcGoal" placeholder="例：受講生全員がAWS基本構成図を自力で描けて発表できる">
+
+  <div class="section-head" style="margin-top:14px;">
+    <h3>🧭 チェック項目（🅿→🅳→🅲→🅰）</h3>
+    <button class="btn btn-main btn-mini" onclick="addRow('pdca')">＋ 行を追加</button>
+  </div>
+  <div class="editor-wrap"><table class="editor" id="tblPdca"></table></div>
+  <div class="note" id="pdcaSummary">進捗サマリー：指標に「60%」のように数値を入れると、ここに平均進捗が出ます🐰</div>
+  <div class="btn-row">
+    <button class="btn btn-sub btn-mini" onclick="insertSamplePdca()">🎁 サンプルを入れる</button>
+    <button class="btn btn-gold" onclick="downloadPdcaMd()">💾 中間チェックポイントmdを保存（Notion貼り付け用）</button>
+  </div>
+</section>
+
+<!-- ===== エクスポート ===== -->
+<section id="tab-export" class="tab">
+  <h2>保存・出力</h2>
+  <details class="step"><summary>📖 このタブの使い方</summary><div class="inner">
+    📊Excel＝現場用 .xlsx（検索数式入り。Excel・Googleスプレッドシート・LibreOffice対応）／💾JSON＝このツール用バックアップ（次回読み込みで完全復元・編集版プロンプト込み）。<b>ファイル名の先頭には日時（YYYYMMDD_HHMM）が自動で付きます</b>🐰
+  </div></details>
+  <div class="note">🐰 <b>JSON＝このツール用の保存形式</b>（次回このツールで読み込めます）／<b>Excel＝研修現場用</b>（5シート構成・検索数式入り。FILTER関数を使わないINDEX/MATCH方式なので、古いExcelでもオフラインでも動きます）。個人情報や固有の案件情報は入れずに、ひな型として使い回しましょう。</div>
+  <div class="btn-row">
+    <button class="btn btn-main" onclick="exportExcel()">📊 Excelで出力（.xlsx・数式入り／Sheets対応）</button>
+    <button class="btn btn-gold" onclick="exportJSON()">💾 JSONで保存（ツール用バックアップ）</button>
+  </div>
+  <h3>保存したJSONを読み込む</h3>
+  <input type="file" id="jsonFile" accept=".json,application/json" style="font-size:.85rem;">
+  <h3>データの初期化</h3>
+  <div class="btn-row">
+    <button class="btn btn-danger" onclick="resetAll()">🗑 全データを初期化（取り消し不可）</button>
+  </div>
+  <p class="save-pill" id="autosaveInfo"></p>
+</section>
+
+</main>
+<svg id="mushRunner" viewBox="0 0 36 36" aria-hidden="true">
+  <defs>
+    <radialGradient id="runCap" cx="42%" cy="22%" r="85%">
+      <stop offset="0%" stop-color="#F2A095"/><stop offset="55%" stop-color="#E8867B"/><stop offset="100%" stop-color="#D86E62"/>
+    </radialGradient>
+    <filter id="runSoft" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="0.6"/></filter>
+  </defs>
+  <g id="mushBody" transform="translate(18,19)">
+    <rect x="-5" y="1" width="10" height="12" rx="4.5" fill="#FFF7E8" stroke="#D9BC95" stroke-width="1.4"/>
+    <path d="M-13,3 Q-15,-1 -11.5,-3.5 Q-12.5,-8 -8,-9 Q-7.5,-13.5 -3,-13 Q0,-16 3,-13 Q7.5,-13.5 8,-9 Q12.5,-8 11.5,-3.5 Q15,-1 13,3 Z"
+          fill="url(#runCap)" stroke="#C9906B" stroke-width="1.3" stroke-linejoin="round"/>
+    <circle cx="-5" cy="-6" r="2.4" fill="#FFF6EC" filter="url(#runSoft)"/>
+    <circle cx="4.5" cy="-8" r="2.8" fill="#FFF6EC" filter="url(#runSoft)"/>
+    <circle cx="1" cy="-3" r="1.6" fill="#FFF6EC" filter="url(#runSoft)" opacity=".8"/>
+    <ellipse cx="-4" cy="-11" rx="3.2" ry="1.5" fill="#FFFFFF" opacity=".45" filter="url(#runSoft)"/>
+    <circle cx="-2" cy="5.5" r="1.15" fill="#3E2E1E"/><circle cx="2" cy="5.5" r="1.15" fill="#3E2E1E"/>
+    <circle cx="-1.6" cy="5.1" r=".42" fill="#FFF"/><circle cx="2.4" cy="5.1" r=".42" fill="#FFF"/>
+    <circle cx="-4.2" cy="7.6" r="1.3" fill="#F8C9C2" filter="url(#runSoft)"/>
+    <circle cx="4.2" cy="7.6" r="1.3" fill="#F8C9C2" filter="url(#runSoft)"/>
+    <path d="M-1,8 q1,1.2 2,0" stroke="#A98770" stroke-width=".9" fill="none" stroke-linecap="round"/>
+  </g>
+</svg>
+<footer><span>🍄 うさうさ研修工房 🐰 v1.21.0 ｜ 単一HTML・オフライン動作・AIオプショナル ｜「面白きこともなき世を面白く」｜<span id="mushToggle" title="ころころキノコのON/OFF">🍄あそび:ON</span></span></footer>
+<div class="copied" id="copiedToast">📋 コピーしました！</div>
+<script>
+/* ================= 状態管理 ================= */
+const LEVELS = ['初級','中級','上級','発表'];
+const emptyState = () => ({
+  meta:{title:'', world:'うさうさラーメン店', cats:'', count:'60〜70', memo:''},
+  prompts:{new:'', excel:''},
+  lessonInfo:{date:'', theme:'', cohort:'', memo:''},
+  pdcaInfo:{round:'第1回', period:'', goal:''},
+  wsInfo:{name:'', directive:'', target:''},
+  questions:[], discussions:[], advanced:[], hints:[], instructorHints:[],
+  preplan:[], qlog:[], pdca:[], ws:[]
+});
+let S = emptyState();
+
+const SCHEMA = {
+  questions:       {cols:['category','level','question','bunkei','rikei','keywords','refBunkei','refRikei'],
+                    heads:['カテゴリ','レベル','質問','文系向け回答（たとえで）','理系向け回答（技術で)','キーワード（同義語・表記ゆれ）','参考記事（文系向け：図解・入門）','参考記事（理系向け：公式Docs等）'], tbl:'tblQ'},
+  discussions:     {cols:['timing','question','guide','expected','aim'],
+                    heads:['タイミング','投げかける質問','誘導（詰まったら）','期待する解答','ねらい・つなぎ先'], tbl:'tblD'},
+  advanced:        {cols:['place','item','aim'],
+                    heads:['場所・場面','追加するもの','ねらい'], tbl:'tblA'},
+  hints:           {cols:['type','content'],
+                    heads:['区分','内容（受講生に投影・配布可）'], tbl:'tblH'},
+  instructorHints: {cols:['stage','content'],
+                    heads:['段階','声かけと狙い（講師専用）'], tbl:'tblI'},
+  preplan:         {cols:['timing','topic','expectQ','level','target','prep'],
+                    heads:['コマ・タイミング','扱う単元','出そうな質問（予想）','レベル','文系/理系','準備するもの（ヒント・図解・参考記事）'], tbl:'tblPre'},
+  ws:              {cols:['kind','level','title','expectQ','hint','guide','ansBunkei','ansRikei'],
+                    heads:['種別','レベル','課題・問題','想定質問（出そうな聞かれ方）','ヒント（考え方）','誘導（経路・詰まったら）','答え：🍡文系（たとえで）','答え：⚙️理系（技術で）'], tbl:'tblWs'},
+  pdca:            {cols:['phase','item','detail','metric','due'],
+                    heads:['フェーズ','項目','内容（Cは Good／More で）','指標・進捗（例：60%）','期限'], tbl:'tblPdca'},
+  qlog:            {cols:['qid','target','level','question','answer','status','note'],
+                    heads:['ID','文系/理系','レベル','出た質問（そのままの言葉で）','答えた内容・対応','ステータス','メモ（誤解ポイント等）'], tbl:'tblLog'}
+};
+const QSTATUS = ['📥 保留','🔵 宿題','🟡 確認待ち','🔴 エスカレ','✅ 即答'];
+const QPREFIX = {'✅ 即答':'DN','🔵 宿題':'WI','🟡 確認待ち':'RV','🔴 エスカレ':'ES','📥 保留':'BL'};
+const PHASES = ['🅿 計画','🅳 実行','🅲 評価Good','🅲 評価More','🅰 改善'];
+const SELECTS = { level: LEVELS, status: QSTATUS, target: ['文系','理系','不明'], phase: PHASES, kind: ['基本','追加'] };
+SCHEMA.questions.heads[4] = '理系向け回答（技術で）';
+
+/* ---- 自動保存（対応環境のみ・失敗しても動く） ---- */
+const LS_KEY = 'usausa_qgen_v1';
+function autosave(){
+  try{ localStorage.setItem(LS_KEY, JSON.stringify(S));
+    document.getElementById('autosaveInfo').textContent = '☁ ブラウザに自動保存済み（' + new Date().toLocaleTimeString('ja-JP') + '）';
+  }catch(e){
+    document.getElementById('autosaveInfo').textContent = '※ この環境では自動保存できません。JSON保存ボタンでこまめにバックアップしてください🐰';
+  }
+}
+function autoload(){
+  try{ const raw = localStorage.getItem(LS_KEY);
+    if(raw){ const d = JSON.parse(raw); if(d && d.questions){ S = Object.assign(emptyState(), d); } }
+  }catch(e){}
+}
+
+/* ================= タブ ================= */
+const nav = document.getElementById('nav');
+nav.addEventListener('click', e=>{
+  const b = e.target.closest('button'); if(!b) return; go(b.dataset.tab);
+});
+function go(id){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active', t.id===id));
+  document.querySelectorAll('#nav button').forEach(b=>b.classList.toggle('active', b.dataset.tab===id));
+  if(id==='tab-prompt') buildPrompts();
+  if(id==='tab-edit') renderAllTables();
+  if(id==='tab-search') runSearch();
+  if(typeof updateGuide==='function') updateGuide(id);
+}
+
+/* ================= 設定 ================= */
+function saveSettings(){
+  S.meta.title = v('inTheme'); S.meta.world = v('inWorld');
+  S.meta.cats = v('inCats'); S.meta.count = v('inCount'); S.meta.memo = v('inMemo');
+  autosave(); renderStats();
+}
+function loadSettingsToForm(){
+  set('inTheme',S.meta.title); set('inWorld',S.meta.world);
+  set('inCats',S.meta.cats); set('inMemo',S.meta.memo);
+  const c=document.getElementById('inCount'); if(S.meta.count) c.value=S.meta.count;
+}
+function v(id){return document.getElementById(id).value.trim();}
+function set(id,val){document.getElementById(id).value = val||'';}
+['inTheme','inWorld','inCats','inCount','inMemo'].forEach(id=>{
+  document.getElementById(id).addEventListener('change', saveSettings);
+});
+
+/* ================= 統計 ================= */
+function renderStats(){
+  const cats = new Set(S.questions.map(q=>q.category).filter(Boolean));
+  const lv = LEVELS.map(l=>`${l} ${S.questions.filter(q=>q.level===l).length}`).join('｜');
+  document.getElementById('statsBar').innerHTML =
+    `<span class="chip">テーマ：<b>${esc(S.meta.title)||'未設定'}</b></span>
+     <span class="chip">質問 <b>${S.questions.length}</b> 問</span>
+     <span class="chip">カテゴリ <b>${cats.size}</b></span>
+     <span class="chip">${lv}</span>
+     <span class="chip">議論 <b>${S.discussions.length}</b>｜発展 <b>${S.advanced.length}</b>｜ヒント <b>${S.hints.length + S.instructorHints.length}</b></span>
+     <span class="chip">🗂 質問ログ <b>${S.qlog.length}</b></span>`;
+}
+
+/* ================= プロンプト生成（編集・保存・再生成対応） ================= */
+const QJSON_SPEC = `{
+  "meta": { "title": "テーマ名", "world": "たとえの世界観" },
+  "questions": [
+    { "category": "カテゴリ名", "level": "初級",
+      "question": "質問文",
+      "bunkei": "文系向け回答（たとえで）",
+      "rikei": "理系向け回答（技術で）",
+      "keywords": "同義語 表記ゆれ カタカナ 略語（スペース区切り）",
+      "refBunkei": "文系向け参考記事（図解・入門系。確実なURL or 検索：◯◯ 図解）",
+      "refRikei": "理系向け参考記事（公式ドキュメント等。確実なURL or 検索キーワード案）" }
+  ],
+  "discussions": [
+    { "timing": "発表後すぐ／時間調整用 など", "question": "投げかける質問",
+      "guide": "誘導（詰まったら）", "expected": "期待する解答", "aim": "ねらい・つなぎ先" }
+  ],
+  "advanced": [ { "place": "場所・場面", "item": "追加するもの", "aim": "ねらい" } ],
+  "hints": [ { "type": "描く順番／チェックリスト など", "content": "受講生に見せてよいヒント" } ],
+  "instructorHints": [ { "stage": "ヒント1（考え方）", "content": "声かけと狙い" } ]
+}`;
+function genPromptNew(){
+  const theme = S.meta.title || '【★研修テーマを設定タブで入力】';
+  const world = S.meta.world || 'うさうさラーメン店';
+  const cats  = S.meta.cats  || '（テーマに合わせて6〜8個提案してください）';
+  const memo  = S.meta.memo ? `\n受講生の前提：${S.meta.memo}` : '';
+  const count = S.meta.count || '60〜70';
+
+  const jsonSpec = QJSON_SPEC;
+
+  return `あなたはIT研修のベテラン講師です。研修中の受講生の質問に即答するための「想定質問集」を作ってください。
+
+# テーマ
+${theme}${memo}
+
+# 必ず守ること
+- 質問数は${count}問、カテゴリは ${cats} を使う
+- レベルは「初級／中級／上級／発表」の4区分（発表＝発表会・グループワーク向け）
+- 1つの質問に必ず2種類の回答を用意する
+  - bunkei（文系向け）：たとえで答える。たとえは【${world}】の世界観で全問統一すること
+  - rikei（理系向け）：正確な技術用語で答える。1〜3文で簡潔に
+- keywords には同義語・表記ゆれ（カタカナ／略語／ひらがな）をスペース区切りで登録する
+  （受講生は正式名称で質問してくれるとは限らないため。検索のヒット率を決める最重要列）
+- discussions（議論質問）は10問前後。「投げかける質問→誘導→期待する解答→ねらい」の4点セット。
+  「時間調整用」の質問も2〜3問含めること
+- advanced（発展）はテーマの一歩先の内容を5〜8件
+- hints は受講生に見せてよいヒント3件前後、instructorHints は講師専用の段階ヒント
+  （ヒント1＝考え方 → ヒント2＝経路・手順 → ヒント3＝ほぼ答え）の3件
+- refBunkei／refRikei（参考記事）は、文系向け＝図解・入門系、理系向け＝公式ドキュメント等でレベル別に分ける。
+  実在が確実なURL（公式ドキュメントのトップページ等）だけURLで書き、少しでも不確かなら
+  「検索：◯◯ 図解」のような検索キーワード案の形式にする（存在しないURLの創作は厳禁）
+- 固有名詞・個人情報・実在の企業の案件情報は入れない
+
+# 出力形式（最重要）
+次のJSON形式「だけ」を出力してください。前置き・後書き・Markdownのコードブロック記号は不要です。
+${jsonSpec}`;
+}
+function genPromptExcel(){
+  const theme = S.meta.title || '【★研修テーマを設定タブで入力】';
+  const world = S.meta.world || 'うさうさラーメン店';
+  const count = S.meta.count || '60〜70';
+  return `添付のExcel「想定質問集」と同じ構造・同じ数式の仕組みで、
+テーマを【${theme}】向けに作り直してください。
+
+維持してほしいこと：
+- 5シート構成（検索／質問集DB／議論質問／発展／ヒント）
+- 質問集DBの列構成（No／カテゴリ／レベル／質問／文系向け回答（たとえで）／
+  理系向け回答（技術で）／キーワード／検索用／ヒット）
+- 検索シートの仕組み（FILTER関数を使わず、ヒット連番＋INDEX/MATCH方式。
+  古いExcelでも動くようにするため）
+- レベルは「初級／中級／上級／発表」の4区分
+- 文系向け回答のたとえは【${world}】の世界観で全問統一すること
+- キーワード列には表記ゆれ・同義語（カタカナ／略語）を登録すること
+
+質問数は${count}問、カテゴリは6〜8個でお願いします。
+議論質問は「投げかける質問→誘導→期待する解答→ねらい」の4点セットで
+10問前後作ってください。`;
+}
+const PROMPT_DEFS = { new:{el:'promptNew', st:'promptNewStatus', gen:genPromptNew},
+                      excel:{el:'promptExcel', st:'promptExcelStatus', gen:genPromptExcel} };
+function buildPrompts(){
+  saveSettings();
+  if(!S.prompts) S.prompts = {new:'', excel:''};
+  for(const key of Object.keys(PROMPT_DEFS)){
+    const def = PROMPT_DEFS[key];
+    const ta = document.getElementById(def.el);
+    ta.value = S.prompts[key] ? S.prompts[key] : def.gen();
+    updatePromptStatus(key);
+  }
+}
+function updatePromptStatus(key){
+  const def = PROMPT_DEFS[key];
+  const st = document.getElementById(def.st);
+  st.textContent = S.prompts[key]
+    ? '✏️ 編集版を表示中（自動保存済み・JSONバックアップにも含まれます）。設定の変更を反映するには「🔄 設定から再生成」'
+    : '⚙️ 設定タブから自動生成中。この欄は直接編集できます——編集するとその内容が保存されます';
+}
+function regenPrompt(key){
+  if(S.prompts[key] && !confirm('編集した内容を破棄して、設定タブの内容から作り直します。よろしいですか？')) return;
+  S.prompts[key] = '';
+  const def = PROMPT_DEFS[key];
+  document.getElementById(def.el).value = def.gen();
+  updatePromptStatus(key); autosave();
+}
+['new','excel'].forEach(key=>{
+  document.getElementById(PROMPT_DEFS[key].el).addEventListener('input', e=>{
+    if(!S.prompts) S.prompts = {new:'', excel:''};
+    S.prompts[key] = (e.target.value === PROMPT_DEFS[key].gen()) ? '' : e.target.value;
+    updatePromptStatus(key); autosaveSoon();
+  });
+});
+
+function copyText(id){
+  const el = document.getElementById(id);
+  const t = (el.value !== undefined && el.tagName === 'TEXTAREA') ? el.value : el.textContent;
+  const done = ()=>{ const c=document.getElementById('copiedToast');
+    c.classList.add('show'); setTimeout(()=>c.classList.remove('show'),1600); };
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(t).then(done).catch(()=>fallbackCopy(t,done));
+  } else fallbackCopy(t,done);
+}
+function fallbackCopy(t,done){
+  const ta=document.createElement('textarea'); ta.value=t; document.body.appendChild(ta);
+  ta.select(); try{document.execCommand('copy');}catch(e){} document.body.removeChild(ta); done();
+}
+
+/* ================= インポート（JSON／Excel共通） ================= */
+function normalizeImport(d){
+  const norm = arr => Array.isArray(arr) ? arr.filter(x=>x && typeof x==='object') : [];
+  return {
+    questions: norm(d.questions).map(q=>({
+      category:str(q.category), level: LEVELS.includes(q.level)?q.level:'初級',
+      question:str(q.question), bunkei:str(q.bunkei||q['文系向け回答']||q.analogy),
+      rikei:str(q.rikei||q['理系向け回答']||q.technical), keywords:str(q.keywords),
+      refBunkei:str(q.refBunkei||q['参考記事（文系向け）']), refRikei:str(q.refRikei||q['参考記事（理系向け）'])})),
+    discussions: norm(d.discussions).map(x=>({timing:str(x.timing),question:str(x.question),guide:str(x.guide),expected:str(x.expected),aim:str(x.aim)})),
+    advanced: norm(d.advanced).map(x=>({place:str(x.place),item:str(x.item),aim:str(x.aim)})),
+    hints: norm(d.hints).map(x=>({type:str(x.type),content:str(x.content)})),
+    instructorHints: norm(d.instructorHints).map(x=>({stage:str(x.stage),content:str(x.content)}))
+  };
+}
+function applyImport(inc, append, meta){
+  if(append){
+    for(const k of Object.keys(inc)) S[k] = S[k].concat(inc[k]);
+  } else {
+    for(const k of Object.keys(inc)) S[k] = inc[k];
+    if(meta){ if(str(meta.title)) S.meta.title=str(meta.title); if(str(meta.world)) S.meta.world=str(meta.world); }
+  }
+  loadSettingsToForm(); autosave(); renderStats(); renderAllTables();
+}
+function importCounts(inc){
+  return `質問 ${inc.questions.length} 問／議論 ${inc.discussions.length}／発展 ${inc.advanced.length}／ヒント ${inc.hints.length+inc.instructorHints.length}`;
+}
+function doImport(append){
+  const stEl = document.getElementById('importStatus');
+  let raw = document.getElementById('importArea').value.trim();
+  if(!raw){ return showStatus(stEl,false,'貼り付け欄が空です。AIの出力（JSON）を貼り付けてください。'); }
+  raw = raw.replace(/^```(json)?/m,'').replace(/```\s*$/m,'').trim();
+  const a = raw.indexOf('{'), b = raw.lastIndexOf('}');
+  if(a>=0 && b>a) raw = raw.slice(a, b+1);
+  let d;
+  try{ d = JSON.parse(raw); }
+  catch(e){ return showStatus(stEl,false,'JSONとして読めませんでした：'+e.message+'<br>AIに「JSONだけを出力して」と伝えて再生成してみてください🐰'); }
+
+  const inc = normalizeImport(d);
+  if(!inc.questions.length && !inc.discussions.length){
+    return showStatus(stEl,false,'questions が見つかりませんでした。プロンプトの出力形式どおりか確認してください。');
+  }
+  applyImport(inc, append, d.meta);
+  showStatus(stEl,true,
+    `読み込みました🐰 ${importCounts(inc)}
+     <br>→ 次は「🔍 検索」で動作確認 →「✏️ 編集」で理系向け回答の技術レビューを！`);
+}
+function str(x){ return (x===null||x===undefined)?'':String(x).trim(); }
+function showStatus(el,ok,msg){ el.className='import-status '+(ok?'ok':'ng'); el.innerHTML=msg; }
+
+/* ================= Excel（.xlsx）そのままインポート ================= */
+/* 依存ライブラリなし：ZIPを自前パース＋DecompressionStreamで展開＋DOMParserでXML解析 */
+async function unzipXlsx(buf){
+  const u8 = new Uint8Array(buf), dv = new DataView(buf);
+  // EOCD（末尾から探索）
+  let eocd = -1;
+  for(let i = u8.length - 22; i >= Math.max(0, u8.length - 65557); i--){
+    if(dv.getUint32(i, true) === 0x06054b50){ eocd = i; break; }
+  }
+  if(eocd < 0) throw new Error('xlsxとして読めません（ZIP終端が見つかりません）');
+  const cdOff = dv.getUint32(eocd + 16, true);
+  const count = dv.getUint16(eocd + 10, true);
+  const files = {};
+  let p = cdOff;
+  for(let n = 0; n < count; n++){
+    if(dv.getUint32(p, true) !== 0x02014b50) break;
+    const method  = dv.getUint16(p + 10, true);
+    const compSz  = dv.getUint32(p + 20, true);
+    const nameLen = dv.getUint16(p + 28, true);
+    const extraLen= dv.getUint16(p + 30, true);
+    const cmtLen  = dv.getUint16(p + 32, true);
+    const locOff  = dv.getUint32(p + 42, true);
+    const name = new TextDecoder().decode(u8.subarray(p + 46, p + 46 + nameLen));
+    files[name] = {method, compSz, locOff};
+    p += 46 + nameLen + extraLen + cmtLen;
+  }
+  async function read(name){
+    const f = files[name]; if(!f) return null;
+    const ln = dv.getUint16(f.locOff + 26, true), le = dv.getUint16(f.locOff + 28, true);
+    const start = f.locOff + 30 + ln + le;
+    const data = u8.subarray(start, start + f.compSz);
+    if(f.method === 0) return new TextDecoder().decode(data);
+    if(f.method === 8){
+      if(typeof DecompressionStream === 'undefined')
+        throw new Error('このブラウザはExcel直読みに未対応です（JSON貼り付けルートをご利用ください）');
+      const ds = new Blob([data]).stream().pipeThrough(new DecompressionStream('deflate-raw'));
+      return await new Response(ds).text();
+    }
+    throw new Error('未対応の圧縮形式です');
+  }
+  return { read, names: Object.keys(files) };
+}
+function xmlDoc(text){ return new DOMParser().parseFromString(text, 'text/xml'); }
+function colIndex(ref){ // "BC12" → 列番号(1始まり)
+  let c = 0;
+  for(const ch of ref){ if(ch >= 'A' && ch <= 'Z') c = c*26 + (ch.charCodeAt(0)-64); else break; }
+  return c;
+}
+async function parseXlsx(buf){
+  const zip = await unzipXlsx(buf);
+  // 共有文字列（リッチテキストの<t>断片も連結）
+  const shared = [];
+  const ssText = await zip.read('xl/sharedStrings.xml');
+  if(ssText){
+    const ss = xmlDoc(ssText);
+    ss.querySelectorAll('si').forEach(si=>{
+      let t = ''; si.querySelectorAll('t').forEach(x=>{ t += x.textContent; });
+      shared.push(t);
+    });
+  }
+  // シート名 → ファイル
+  const wb = xmlDoc(await zip.read('xl/workbook.xml'));
+  const rels = xmlDoc(await zip.read('xl/_rels/workbook.xml.rels'));
+  const relMap = {};
+  rels.querySelectorAll('Relationship').forEach(r=>{ relMap[r.getAttribute('Id')] = r.getAttribute('Target'); });
+  const sheets = {};
+  for(const sh of wb.querySelectorAll('sheet')){
+    const name = sh.getAttribute('name');
+    const rid = sh.getAttribute('r:id') || sh.getAttributeNS('http://schemas.openxmlformats.org/officeDocument/2006/relationships','id');
+    let target = relMap[rid] || '';
+    if(target && !target.startsWith('xl/')) target = 'xl/' + target.replace(/^\//,'');
+    const xml = await zip.read(target);
+    if(!xml) continue;
+    const doc = xmlDoc(xml);
+    const rows = [];
+    doc.querySelectorAll('sheetData > row').forEach(row=>{
+      const rIdx = parseInt(row.getAttribute('r')||rows.length+1, 10);
+      const arr = rows[rIdx-1] = rows[rIdx-1] || [];
+      row.querySelectorAll('c').forEach(c=>{
+        const ref = c.getAttribute('r') || ''; const ci = colIndex(ref) || (arr.length+1);
+        const t = c.getAttribute('t'); let val = '';
+        const vEl = c.querySelector('v');
+        if(t === 's'){ val = shared[parseInt(vEl ? vEl.textContent : '-1',10)] ?? ''; }
+        else if(t === 'inlineStr'){ const is = c.querySelector('is'); val = is ? is.textContent : ''; }
+        else { val = vEl ? vEl.textContent : ''; }
+        arr[ci-1] = str(val);
+      });
+    });
+    sheets[name] = Array.from(rows, r => r || []);
+  }
+  return mapWorkbook(sheets);
+}
+function mapWorkbook(sheets){
+  const names = Object.keys(sheets);
+  const get = n => sheets[n] || null;
+  const cell = (r,i) => str((r||[])[i]);
+  // 質問集DB
+  const qName = names.find(n=>n.includes('質問集')) || names.find(n=>n.includes('DB'));
+  if(!qName) throw new Error('「質問集DB」シートが見つかりません（5シート構成のExcelをご利用ください）');
+  const questions = [];
+  const qRows = get(qName);
+  const hasRef = str((qRows[0]||[])[7]).includes('参考');   // 旧フォーマット（H列=検索用）と自動判別
+  for(const r of qRows.slice(1)){
+    if(!cell(r,3) && !cell(r,1)) continue;
+    if(!cell(r,3)) continue;
+    questions.push({ category:cell(r,1), level: LEVELS.includes(cell(r,2)) ? cell(r,2) : '初級',
+      question:cell(r,3), bunkei:cell(r,4), rikei:cell(r,5), keywords:cell(r,6),
+      refBunkei: hasRef ? cell(r,7) : '', refRikei: hasRef ? cell(r,8) : '' });
+  }
+  // 議論質問
+  const discussions = [];
+  const dName = names.find(n=>n.includes('議論'));
+  if(dName){
+    let inTable = false;
+    for(const r of get(dName)){
+      if(cell(r,0) === 'No'){ inTable = true; continue; }
+      if(inTable && cell(r,2)) discussions.push({timing:cell(r,1),question:cell(r,2),guide:cell(r,3),expected:cell(r,4),aim:cell(r,5)});
+    }
+  }
+  // ヒント（No表の1つ目→hints、2つ目以降→instructorHints）
+  const hints = [], instructorHints = [];
+  const hName = names.find(n=>n.includes('ヒント'));
+  if(hName){
+    let tableNo = 0, inTable = false;
+    for(const r of get(hName)){
+      if(cell(r,0) === 'No'){ tableNo++; inTable = true; continue; }
+      const filled = r.filter(x=>str(x)).length;
+      if(filled <= 1){ inTable = false; continue; }
+      if(!inTable) continue;
+      if(tableNo === 1) hints.push({type:cell(r,1), content:cell(r,2)});
+      else instructorHints.push({stage:cell(r,1), content:cell(r,2)});
+    }
+  }
+  // 発展（残りのシートのNo表）
+  const advanced = [];
+  const used = [qName, dName, hName, names.find(n=>n.includes('検索'))];
+  for(const n of names.filter(x=>!used.includes(x))){
+    let inTable = false;
+    for(const r of get(n)){
+      if(cell(r,0) === 'No'){ inTable = true; continue; }
+      const filled = r.filter(x=>str(x)).length;
+      if(filled <= 1){ inTable = false; continue; }
+      if(inTable && cell(r,1)) advanced.push({place:cell(r,1), item:cell(r,2), aim:cell(r,3)});
+    }
+  }
+  return {questions, discussions, advanced, hints, instructorHints};
+}
+let pendingXlsx = null;
+document.getElementById('xlsxFile').addEventListener('change', async e=>{
+  const f = e.target.files[0]; if(!f) return;
+  const stEl = document.getElementById('importStatus');
+  showStatus(stEl, true, '📗 Excelを読み込んでいます…');
+  try{
+    const buf = await f.arrayBuffer();
+    const parsed = await parseXlsx(buf);
+    const inc = normalizeImport(parsed);
+    if(!inc.questions.length) throw new Error('質問データが読み取れませんでした（列構成をご確認ください）');
+    pendingXlsx = inc;
+    document.getElementById('xlsxApplyRow').style.display='flex';
+    showStatus(stEl, true, `📗 「${esc(f.name)}」を解析しました：${importCounts(inc)}<br>下のボタンで反映方法を選んでください🐰`);
+  }catch(err){
+    pendingXlsx = null;
+    document.getElementById('xlsxApplyRow').style.display='none';
+    showStatus(stEl, false, 'Excelを読み込めませんでした：'+esc(err.message)+'<br>5シート構成（検索／質問集DB／議論質問／発展／ヒント）のファイルかご確認ください。だめなときはJSON貼り付けルートで🐰');
+  }
+  e.target.value = '';
+});
+function applyXlsx(append){
+  if(!pendingXlsx) return;
+  applyImport(pendingXlsx, append, null);
+  showStatus(document.getElementById('importStatus'), true,
+    `Excelから${append?'追記':'読み込み（置き換え）'}しました🐰 ${importCounts(pendingXlsx)}<br>→ 「🔍 検索」で動作確認を！`);
+  pendingXlsx = null;
+  document.getElementById('xlsxApplyRow').style.display='none';
+}
+
+/* ================= 編集テーブル ================= */
+function renderAllTables(){ for(const key of Object.keys(SCHEMA)) renderTable(key); }
+function renderTable(key){
+  const sc = SCHEMA[key], tbl = document.getElementById(sc.tbl);
+  let html = '<tr><th style="width:36px;">No</th>' + sc.heads.map(h=>`<th>${h}</th>`).join('') + '<th style="width:60px;"></th></tr>';
+  S[key].forEach((row,i)=>{
+    html += `<tr><td style="text-align:center;color:#9C7A55;">${i+1}</td>`;
+    sc.cols.forEach(c=>{
+      if(SELECTS[c]){
+        const opts = SELECTS[c].map(l=>`<option ${row[c]===l?'selected':''}>${l}</option>`).join('');
+        html += `<td style="min-width:70px;"><select data-key="${key}" data-i="${i}" data-c="${c}" style="border:none;background:transparent;font-size:.78rem;">${opts}</select></td>`;
+      } else {
+        html += `<td contenteditable="true" data-key="${key}" data-i="${i}" data-c="${c}">${esc(row[c])}</td>`;
+      }
+    });
+    const extra = sc.extraBtn ? sc.extraBtn(i, row) : '';
+    html += `<td style="text-align:center;white-space:nowrap;">${extra}<button class="btn btn-danger btn-mini" onclick="delRow('${key}',${i})">削除</button></td></tr>`;
+  });
+  if(!S[key].length){
+    html += `<tr><td colspan="${sc.cols.length+2}" style="text-align:center;color:#9C7A55;padding:14px;">まだデータがありません。「＋追加」「📥 インポート」、または <button class="btn btn-sub btn-mini" onclick="insertSampleSection('${key}')">🎁 サンプルを入れる</button> からどうぞ🐰</td></tr>`;
+  }
+  tbl.innerHTML = html;
+}
+document.addEventListener('input', e=>{
+  const el = e.target;
+  if(el.matches('td[contenteditable]')){
+    S[el.dataset.key][el.dataset.i][el.dataset.c] = el.innerText.trim();
+    autosaveSoon();
+  }
+});
+document.addEventListener('change', e=>{
+  const el = e.target;
+  if(el.matches('select[data-key]')){
+    S[el.dataset.key][el.dataset.i][el.dataset.c] = el.value; autosave(); renderStats();
+  }
+});
+let saveTimer=null;
+function autosaveSoon(){ clearTimeout(saveTimer); saveTimer=setTimeout(()=>{autosave();renderStats();},600); }
+function addRow(key){
+  const sc = SCHEMA[key], row = {};
+  sc.cols.forEach(c=> row[c] = (c==='level'?'初級': c==='status'?'📥 保留': c==='target'?'不明': c==='phase'?'🅿 計画': c==='kind'?'基本':''));
+  if(key==='qlog' && !row.qid) row.qid = nextQid('📥 保留');
+  S[key].push(row); renderTable(key); autosave(); renderStats();
+  const rows = document.getElementById(sc.tbl).rows;
+  const cell = rows[rows.length-1].querySelector('td[contenteditable]');
+  if(cell) cell.focus();
+}
+function delRow(key,i){
+  if(!confirm('No.'+(i+1)+' を削除します。よろしいですか？')) return;
+  S[key].splice(i,1); renderTable(key); autosave(); renderStats();
+}
+
+/* ================= 検索 ================= */
+document.getElementById('searchBox').addEventListener('input', runSearch);
+function runSearch(){
+  const kw = document.getElementById('searchBox').value.trim().toLowerCase();
+  const hc = document.getElementById('hitCount'), out = document.getElementById('searchResults');
+  if(!S.questions.length){
+    hc.textContent='';
+    out.innerHTML='<div class="note">まだ質問集DBが空です。<button class="btn btn-main btn-mini" onclick="insertSampleSearch()">🎁 サンプルDBを入れて検索を試す</button>　（本番データは「📥 インポート」から）🐰</div>';
+    return;
+  }
+  if(!kw){ hc.textContent='← キーワードを入力（Excelの黄色セルと同じ、部分一致です）'; out.innerHTML=''; return; }
+  const hits = S.questions.map((q,i)=>({q,i})).filter(({q})=>
+    [q.category,q.level,q.question,q.bunkei,q.rikei,q.keywords,q.refBunkei,q.refRikei].join(' ').toLowerCase().includes(kw));
+  const dHits = S.discussions.filter(d=>[d.timing,d.question,d.guide,d.expected,d.aim].join(' ').toLowerCase().includes(kw));
+  hc.textContent = `${hits.length} 件ヒット` + (dHits.length?`（＋議論質問 ${dHits.length} 件）`:'');
+  let html = hits.map(({q,i})=>buildQCard(q,i,kw)).join('');
+  html += dHits.map(d=>`
+    <div class="card" style="border-color:#CBB7DD;">
+      <div class="meta">💬 議論質問　${esc(d.timing)}</div>
+      <div class="q">${hl(esc(d.question),kw)}</div>
+      <div class="ans2">
+        <div class="ans ans-b"><span class="tag">🧭 誘導（詰まったら）</span>${hl(esc(d.guide),kw)}</div>
+        <div class="ans ans-r"><span class="tag">🎯 期待する解答</span>${hl(esc(d.expected),kw)}</div>
+      </div>
+      <div class="kw">ねらい：${esc(d.aim)}</div>
+    </div>`).join('');
+  out.innerHTML = html || '<div class="note">ヒットなし。キーワード列に同義語を追加しておくとヒット率が上がります🐰</div>';
+}
+function buildQCard(q, i, kw){
+  return `
+    <div class="card">
+      <div class="meta">No.${i+1}　${hl(esc(q.category),kw)}　<span class="lv lv-${q.level}">${q.level}</span></div>
+      <div class="q">${hl(esc(q.question),kw)}</div>
+      <div class="ans2">
+        <div class="ans ans-b"><span class="tag">🍡 文系向け（たとえで）</span>${hl(esc(q.bunkei),kw)}</div>
+        <div class="ans ans-r"><span class="tag">⚙️ 理系向け（技術で）</span>${hl(esc(q.rikei),kw)}</div>
+      </div>
+      <div class="kw">🔑 ${hl(esc(q.keywords),kw)}</div>
+      ${refLine(q, kw)}
+    </div>`;
+}
+function esc(s){ return str(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function linkify(escaped){ return escaped.replace(/(https?:\/\/[^\s|）)」<]+)/g,'<a href="$1" target="_blank" rel="noopener" style="color:var(--leaf-deep);word-break:break-all;">$1</a>'); }
+function refLine(q, kw){
+  if(!str(q.refBunkei) && !str(q.refRikei)) return '';
+  const f = s => s ? linkify(esc(s)) : '—';   // URLを壊さないため参考記事行はハイライトしない
+  return `<div class="kw">📰 参考記事｜🍡文系: ${f(q.refBunkei)}　／　⚙️理系: ${f(q.refRikei)}</div>`;
+}
+function hl(escaped,kw){
+  if(!kw) return escaped;
+  const re = new RegExp('('+kw.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+')','gi');
+  return escaped.replace(re,'<mark>$1</mark>');
+}
+
+/* ================= JSON保存／読込 ================= */
+function exportJSON(){
+  const name = (S.meta.title||'想定質問集').replace(/[\\/:*?"<>|]/g,'_');
+  download(name+'_想定質問集.json', JSON.stringify(S,null,2), 'application/json');
+}
+document.getElementById('jsonFile').addEventListener('change', e=>{
+  const f = e.target.files[0]; if(!f) return;
+  const r = new FileReader();
+  r.onload = ()=>{ try{
+      const d = JSON.parse(r.result);
+      if(!d.questions) throw new Error('このツールのJSONではないようです');
+      S = Object.assign(emptyState(), d);
+      loadSettingsToForm(); autosave(); renderStats(); renderAllTables();
+      alert('読み込みました🐰 質問 '+S.questions.length+' 問');
+    }catch(err){ alert('読み込めませんでした：'+err.message); } };
+  r.readAsText(f);
+});
+function resetAll(){
+  if(!confirm('すべてのデータを初期化します。JSONで保存していない内容は失われます。よろしいですか？')) return;
+  S = emptyState(); try{localStorage.removeItem(LS_KEY);}catch(e){}
+  loadSettingsToForm(); renderStats(); renderAllTables();
+  alert('初期化しました🐰');
+}
+function stamp(){
+  const d = new Date(), p = n => String(n).padStart(2,'0');
+  return `${d.getFullYear()}${p(d.getMonth()+1)}${p(d.getDate())}_${p(d.getHours())}${p(d.getMinutes())}`;
+}
+function download(name, content, mime){
+  name = stamp() + '_' + name;   // 例：20260606_1530_想定質問集_◯◯.xls
+  const blob = new Blob([content], {type:mime});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob); a.download = name;
+  document.body.appendChild(a); a.click();
+  setTimeout(()=>{URL.revokeObjectURL(a.href); a.remove();}, 500);
+}
+
+/* ================= Excel出力（SpreadsheetML・5シート・数式入り） ================= */
+function xesc(s){ return str(s)
+  .replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g,'')   // XML不正な制御文字を除去（\t\n\rは保持）
+  .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function cellS(v, style){ return `<Cell${style?` ss:StyleID="${style}"`:''}><Data ss:Type="String">${xesc(v)}</Data></Cell>`; }
+function cellN(v, style){ return `<Cell${style?` ss:StyleID="${style}"`:''}><Data ss:Type="Number">${v}</Data></Cell>`; }
+function cellF(formula, style){ return `<Cell${style?` ss:StyleID="${style}"`:''} ss:Formula="${xesc(formula)}"><Data ss:Type="String"></Data></Cell>`; }
+
+function exportExcel(){
+  if(!S.questions.length){ alert('質問集DBが空です。まずインポートか編集タブで質問を作りましょう🐰'); return; }
+  const n = S.questions.length, last = n + 1;
+  const RESULT_ROWS = Math.min(Math.max(n,30), 60);
+  const title = S.meta.title || '想定質問集';
+  const sheets = [];
+
+  /* --- 検索（A1形式の標準数式） --- */
+  const sRows = [];
+  sRows.push([xT(`想定質問 クイック検索（${title}）`,4)]);
+  sRows.push([xT('黄色のセルにキーワードを入力すると、該当する質問と回答が下に並びます（部分一致）。表記ゆれは「キーワード」列に同義語を登録済み。')]);
+  sRows.push([xT('キーワード',1), xT('',3), null,
+    xF(`IF($B$3="","← キーワードを入力",COUNT('質問集DB'!$K$2:$K$${last})&" 件ヒット")`,4)]);
+  sRows.push([]);
+  sRows.push(['No','カテゴリ','レベル','質問','文系向け回答（たとえで）','理系向け回答（技術で）','参考記事（文系向け）','参考記事（理系向け）'].map(x=>xT(x,1)));
+  const SRC = [1,2,3,4,5,6,8,9];   // DB列（G=キーワードは結果では省略）
+  for(let k=1;k<=RESULT_ROWS;k++){
+    sRows.push(SRC.map((c,j)=>{
+      const L = colName(c);
+      const idx = `INDEX('質問集DB'!${L}$2:${L}$${last},MATCH(${k},'質問集DB'!$K$2:$K$${last},0))`;
+      return xF(j===0 ? `IFERROR(${idx},"")` : `IFERROR(${idx}&"","")`, j>=3?2:0);
+    }));
+  }
+  sheets.push({name:'検索', widths:[9,12,7,30,38,38,24,24], rows:sRows});
+
+  /* --- 質問集DB --- */
+  const dbRows = [['No','カテゴリ','レベル','質問','文系向け回答（たとえで）','理系向け回答（技術で）','キーワード','参考記事（文系向け）','参考記事（理系向け）','検索用','ヒット'].map(x=>xT(x,1))];
+  S.questions.forEach((q,i)=>{
+    const r = i + 2;
+    dbRows.push([xN(i+1), xT(q.category), xT(q.level), xT(q.question,2), xT(q.bunkei,2), xT(q.rikei,2), xT(q.keywords,2), xT(q.refBunkei,2), xT(q.refRikei,2),
+      xF(`B${r}&" "&C${r}&" "&D${r}&" "&E${r}&" "&F${r}&" "&G${r}&" "&H${r}&" "&I${r}`),
+      xF(`IF('検索'!$B$3="","",IF(ISNUMBER(SEARCH('検索'!$B$3,J${r})),MAX(K$1:K${r-1})+1,""))`)]);
+  });
+  sheets.push({name:'質問集DB', widths:[5,12,7,28,38,38,22,24,24,6,6], rows:dbRows});
+
+  /* --- 議論質問 --- */
+  const diRows = [[xT('発表で議論を深める質問（質問→誘導→解答の順に小出しにする）',4)],
+    ['No','タイミング','投げかける質問','誘導（詰まったら）','期待する解答','ねらい・つなぎ先'].map(x=>xT(x,1))];
+  S.discussions.forEach((d,i)=>{ diRows.push([xN(i+1), xT(d.timing), xT(d.question,2), xT(d.guide,2), xT(d.expected,2), xT(d.aim,2)]); });
+  sheets.push({name:'議論質問', widths:[5,12,30,28,40,24], rows:diRows});
+
+  /* --- 発展 --- */
+  const adRows = [[xT('発展：テーマの一歩先（どこに何を足すか）',4)],
+    ['No','場所・場面','追加するもの','ねらい'].map(x=>xT(x,1))];
+  S.advanced.forEach((d,i)=>{ adRows.push([xN(i+1), xT(d.place), xT(d.item,2), xT(d.aim,2)]); });
+  sheets.push({name:'発展', widths:[5,16,28,44], rows:adRows});
+
+  /* --- ヒント --- */
+  const hRows = [[xT('ヒントシート（上段＝受講生に見せてよい／下段＝講師専用）',4)],
+    ['No','区分','内容（受講生に投影・配布可）'].map(x=>xT(x,1))];
+  S.hints.forEach((d,i)=>{ hRows.push([xN(i+1), xT(d.type), xT(d.content,2)]); });
+  hRows.push([]);
+  hRows.push([xT('机間巡視用：段階ヒント（講師専用・小出しにする）',4)]);
+  hRows.push(['No','段階','声かけと狙い（講師専用）'].map(x=>xT(x,1)));
+  S.instructorHints.forEach((d,i)=>{ hRows.push([xN(i+1), xT(d.stage), xT(d.content,2)]); });
+  sheets.push({name:'ヒント', widths:[5,16,60], rows:hRows});
+
+  /* --- 質問ログ（実績があれば） --- */
+  if(S.qlog.length){
+    const H = lessonHead();
+    const lRows = [[xT(`レッスン実績 質問ログ（${H.theme}／${H.date}）`,4)],
+      ['ID','文系/理系','レベル','出た質問','答えた内容・対応','ステータス','メモ'].map(x=>xT(x,1))];
+    S.qlog.forEach(r=>{ lRows.push([xT(r.qid), xT(r.target), xT(r.level), xT(r.question,2), xT(r.answer,2), xT(r.status), xT(r.note,2)]); });
+    sheets.push({name:'質問ログ', widths:[8,9,7,36,36,11,20], rows:lRows});
+  }
+
+  download(`想定質問集_${safeName(title)}.xlsx`, buildXlsx(sheets), XLSX_MIME);
+  alert('Excel（.xlsx）を出力しました🐰\n検索シートの黄色セルにキーワードを入れて動作確認を！');
+}
+
+/* ================= 即答アシスタント（ふわっと仮説サポート） ================= */
+function bigrams(s){
+  s = str(s).toLowerCase().replace(/[\s、。！？!?「」（）()・]/g,'');
+  const r = []; for(let i=0;i<s.length-1;i++) r.push(s.slice(i,i+2)); return r;
+}
+function hypoScore(input, q){
+  const text = [q.question,q.keywords,q.category,q.bunkei,q.rikei].join(' ').toLowerCase();
+  const inb = bigrams(input); if(!inb.length) return 0;
+  const tb = new Set(bigrams(text));
+  let hit = 0; inb.forEach(b=>{ if(tb.has(b)) hit++; });
+  let score = inb.length ? hit / inb.length : 0;       // 入力のうちDB文面と重なる割合
+  const low = input.toLowerCase();
+  const kanji = [...new Set((str(input).match(/[\u4E00-\u9FFF]/g) || []))];
+  if(kanji.length){                                    // 漢字1文字マッチ（「増える」→「増減」等の活用ゆれ対策）
+    const core = (str(q.question)+' '+str(q.keywords)).toLowerCase(); // 高シグナル欄
+    let kc = 0, kt = 0;
+    kanji.forEach(c=>{ if(core.includes(c)) kc++; if(text.includes(c)) kt++; });
+    score += 0.7 * kc / kanji.length + 0.25 * kt / kanji.length;
+  }
+  let kwBoost = 0;
+  str(q.keywords).split(/[\s,、／/]+/).forEach(k=>{    // キーワード直撃ボーナス（上限あり）
+    if(k && k.length>=2 && low.includes(k.toLowerCase())) kwBoost += 0.25;
+  });
+  score += Math.min(kwBoost, 0.5);
+  if(q.question && low.includes(q.question.toLowerCase().replace(/[？?]/g,''))) score += 0.3;
+  return score;
+}
+function topHypotheses(input, n){
+  return S.questions.map((q,i)=>({q,i,score:hypoScore(input,q)}))
+    .filter(x=>x.score>0.12)
+    .sort((a,b)=>b.score-a.score)
+    .slice(0,n||5);
+}
+function runAssist(){
+  const input = v('assistInput');
+  const out = document.getElementById('assistResults');
+  document.getElementById('aiArea').style.display='none';
+  if(!input){ out.innerHTML = '<div class="note">受講生の質問を入力してください🐰</div>'; return; }
+  if(!S.questions.length){ out.innerHTML = '<div class="note">質問集DBが空です。<button class="btn btn-main btn-mini" onclick="insertSampleAssist()">🎁 サンプルで仮説を体験する</button>　本番は「📥 インポート」か「✏️ 編集」でDBを育てましょう🐰</div>'; return; }
+  const hits = topHypotheses(input, 5);
+  if(!hits.length){
+    out.innerHTML = `<div class="note">DBから仮説を立てられませんでした。<b>🤖 AIに答え方を相談</b>するか、新しい質問としてDBに追記しましょう（今日の追記が明日の即答になります🐰）</div>`;
+    return;
+  }
+  const maxS = hits[0].score;
+  out.innerHTML = '<h3>🍄 仮説（確からしい順）— 逆質問で確認してから答えましょう</h3>' + hits.map((h,rank)=>{
+    const pct = Math.min(99, Math.round(h.score/Math.max(maxS,1)*100 * (h.score>1?1:h.score<0.3?0.6:0.85)));
+    return `<div class="card">
+      <div class="meta">仮説${rank+1}　一致度のめやす ${pct}%　｜　No.${h.i+1}　${esc(h.q.category)}　<span class="lv lv-${h.q.level}">${h.q.level}</span></div>
+      <div class="q">「${esc(h.q.question)}」のことを聞きたいのかも？</div>
+      <div class="ans2">
+        <div class="ans ans-b"><span class="tag">🍡 文系向け（たとえで）</span>${esc(h.q.bunkei)}</div>
+        <div class="ans ans-r"><span class="tag">⚙️ 理系向け（技術で）</span>${esc(h.q.rikei)}</div>
+      </div>
+      <div class="kw">💬 逆質問の例：「${esc(h.q.category)}の、${esc(firstKeyword(h.q))}あたりの話で合っていますか？」</div>
+      ${refLine(h.q, '')}
+    </div>`;
+  }).join('');
+}
+function firstKeyword(q){
+  const k = str(q.keywords).split(/[\s,、]+/).filter(x=>x.length>=2);
+  return k[0] || q.category || 'この部分';
+}
+function buildAssistPrompt(input){
+  const hits = topHypotheses(input, 4);
+  const ctx = hits.length ? hits.map((h,i)=>
+    `${i+1}. Q:${h.q.question}\n   文系向け:${h.q.bunkei}\n   理系向け:${h.q.rikei}`).join('\n')
+    : '（近い質問はDBにありませんでした）';
+  return `あなたはIT研修のベテラン講師アシスタントです。受講生から「ふわっとした質問」が出ました。仮説を立てて答え方を提案してください。
+
+受講生の質問：「${input}」
+研修テーマ：${S.meta.title||'（未設定）'}
+たとえの世界観：${S.meta.world||'（未設定）'}（文系向け回答はこの世界観で統一）
+
+手元の想定質問集で近いもの：
+${ctx}
+
+次の形式で簡潔に答えてください：
+# 仮説（この受講生が本当に聞きたいこと・2案）
+# 確認のための逆質問（1つ・やさしい言葉で）
+# 回答案
+- 文系向け（たとえで・3文以内）
+- 理系向け（正確な技術用語で・3文以内）
+# 講師メモ（誤解しやすいポイントを1つ）`;
+}
+/* ================= AI接続（3モード：Claude内／APIキー／手動） ================= */
+let aiMode = 'claude';   // 既定＝Claude内（キー不要）
+let apiKey = '';         // メモリのみ。保存しない。
+const modeStatus = {
+  claude: '☁️ claude.ai内ならこのまま動きます',
+  keyEmpty: '🔑 APIキーを入力してください（メモリのみ・保存しません・リロードで消えます）',
+  keyOn: '🔑 オンライン検索モード ON（キーはメモリのみ・リロードで消えます）',
+  keyOdd: '⚠ キーの形式が見慣れません（sk-ant-…で始まるはずです）。そのまま試すこともできます。',
+  manual: '✍️ AIには接続せず、毎回プロンプトをコピーして手動でAIに貼り付ける運用です'
+};
+function refreshModeUI(){
+  document.getElementById('keyWrap').style.display = (aiMode==='key') ? 'block' : 'none';
+  const st = document.getElementById('apiKeyStatus');
+  if(aiMode==='claude') st.textContent = modeStatus.claude;
+  else if(aiMode==='manual') st.textContent = modeStatus.manual;
+  else st.textContent = !apiKey ? modeStatus.keyEmpty : (/^sk-ant-/.test(apiKey) ? modeStatus.keyOn : modeStatus.keyOdd);
+}
+document.getElementById('aiModeSelect').addEventListener('change', e=>{ aiMode = e.target.value; refreshModeUI(); });
+document.getElementById('apiKeyInput').addEventListener('input', e=>{ apiKey = e.target.value.trim(); refreshModeUI(); });
+async function callClaude(messages, useWebSearch, maxTokens){
+  if(aiMode==='manual'){ const e = new Error('manual'); e.manual = true; throw e; }
+  if(aiMode==='key' && !apiKey){ const e = new Error('needkey'); e.needKey = true; throw e; }
+  const body = { model:'claude-sonnet-4-20250514', max_tokens: maxTokens || 2000, messages };
+  if(useWebSearch) body.tools = [{type:'web_search_20250305', name:'web_search'}];
+  const headers = {'Content-Type':'application/json'};
+  if(aiMode==='key'){
+    headers['x-api-key'] = apiKey;
+    headers['anthropic-version'] = '2023-06-01';
+    headers['anthropic-dangerous-direct-browser-access'] = 'true';
+  }
+  const res = await fetch('https://api.anthropic.com/v1/messages', {method:'POST', headers, body:JSON.stringify(body)});
+  if(!res.ok){
+    let detail=''; try{ const j = await res.json(); detail = (j.error && j.error.message) || ''; }catch(_){}
+    const err = new Error('HTTP '+res.status+(detail?'：'+detail:'')); err.status = res.status; err.detail = detail;
+    throw err;
+  }
+  const data = await res.json();
+  const text = (data.content||[]).filter(b=>b.type==='text').map(b=>b.text).join('\n').trim();
+  if(!text) throw new Error('empty');
+  return text;
+}
+async function callClaudeSmart(messages, useWebSearch, maxTokens){
+  try{ return await callClaude(messages, useWebSearch, maxTokens); }
+  catch(e){
+    if(e.manual || e.needKey) throw e;
+    // web検索ツールが使えない契約・環境なら、検索なしで一度だけリトライ
+    if(useWebSearch && e.status && e.status < 500){
+      try{ return await callClaude(messages, false, maxTokens); }catch(e2){ throw e2; }
+    }
+    throw e;
+  }
+}
+function offlineHint(e){
+  if(e && e.manual) return '✍️ <b>手動モード</b>です。下のプロンプトをコピーして、お使いのAI（claude.aiなど）に貼り付けてください🐰';
+  if(e && e.needKey) return '🔑 APIキーモードですが、キーが未入力です。<b>ページ上部のAI接続モード欄にキーを入力</b>してください🐰（下のプロンプトをコピーして手動で使うこともできます）';
+  const reason = (e && e.message && e.message !== 'empty' && !/Failed to fetch|NetworkError|fetch/i.test(e.message))
+    ? '（'+esc(e.message)+'）' : '';
+  if(aiMode==='key') return 'AIに接続できませんでした'+reason+'。キーの有効性・残高・ネットワークをご確認ください。下のプロンプトをコピーして使うこともできます🐰';
+  return '☁️ Claude内モードで接続できませんでした'+reason+'。<b>claude.aiの外で開いている場合は、ページ上部で「🔑 APIキーで使う」か「✍️ 手動コピペ」に切り替えてください</b>🐰';
+}
+async function askAI(){
+  const input = v('assistInput');
+  if(!input){ document.getElementById('assistResults').innerHTML='<div class="note">先に受講生の質問を入力してください🐰</div>'; return; }
+  const area = document.getElementById('aiArea'), st = document.getElementById('aiStatus'),
+        out = document.getElementById('aiOut'), row = document.getElementById('aiCopyRow');
+  area.style.display='block'; st.style.display='block'; out.style.display='none'; row.style.display='none';
+  st.innerHTML = '🐰 AIに相談中です…（数秒お待ちください）';
+  const prompt = buildAssistPrompt(input);
+  try{
+    const text = await callClaudeSmart([{role:'user', content:prompt}], false);
+    st.innerHTML = '🤖 AIの提案です。<b>仮説はあくまで仮説</b>——技術的な正しさの最終確認は人間の仕事です🐰';
+    out.textContent = text; out.style.display='block';
+  }catch(e){
+    st.innerHTML = offlineHint(e);
+    out.textContent = prompt; out.style.display='block'; row.style.display='flex';
+  }
+}
+
+
+/* ================= 30秒ティーチングレシピ（DBなしでも動く） ================= */
+let lastRecipeText = '';
+function buildRecipePrompt(input, hypo, level, steps){
+  const dbCtx = S.questions.length
+    ? '\n手元の想定質問集で近いもの（参考まで）：\n' + topHypotheses(input,3).map((h,i)=>
+        `${i+1}. Q:${h.q.question}／文系:${h.q.bunkei}／理系:${h.q.rikei}`).join('\n')
+    : '';
+  return `あなたはIT研修のベテラン講師アシスタントです。新人のサブ講師が、受講生からの「ふわっとした質問」にその場で自信を持って答えられるよう、30秒で読めるティーチングレシピを作ってください。
+
+受講生の質問：「${input}」
+講師の仮説：${hypo ? '「'+hypo+'」' : 'なし——仮説もあなたが立ててください'}
+受講生のレベル：${level}
+${S.meta.title ? '研修テーマ：'+S.meta.title : ''}${S.meta.world ? '\nたとえの世界観：'+S.meta.world+'（文系向けの説明はこの世界観で統一）' : ''}${dbCtx}
+
+出力形式（この見出し・順番のまま、全体を簡潔に）：
+## 仮説の確認
+受講生が本当に聞きたいことの仮説を1〜2案。講師の仮説があれば、その妥当性も一言。
+## まず返す逆質問（1つ・やさしい言葉で）
+## ステップバイステップ解説
+受講生のレベルに合わせて${steps}ステップ前後。1ステップ1〜2文。初級なら専門用語に必ず（一言注釈）を付ける。各ステップは「受講生にそのまま話せる言葉」で。
+## 文系向けの答え方（たとえで・3文以内）
+## 理系向けの答え方（正確な技術用語で・3文以内）
+## 受講生にシェアできる参考記事
+web検索で実在を確認した記事・公式ドキュメントを2〜3件。「タイトル｜URL｜30秒でどこを読むか」の形式。見つからなければ正直に「検索キーワード案」を出す。
+## 講師メモ
+誤解しやすいポイント1つ＋次に来そうな質問1つ。`;
+}
+async function makeRecipe(){
+  const input = v('assistInput');
+  const st = document.getElementById('recipeStatus'), out = document.getElementById('recipeOut');
+  const shareRow = document.getElementById('recipeShareRow');
+  const pBox = document.getElementById('recipePrompt'), pRow = document.getElementById('recipePromptRow');
+  document.getElementById('refLinksOut').style.display='none';
+  if(!input){ st.style.display='block'; st.innerHTML='上の欄に受講生の質問を入力してください🐰（DBは空でもOKです）'; return; }
+  const hypo = v('recipeHypo'), level = v('recipeLevel'), steps = v('recipeSteps');
+  const prompt = buildRecipePrompt(input, hypo, level, steps);
+  st.style.display='block'; st.innerHTML = aiMode==='manual'
+    ? '✍️ 手動モード：プロンプトを用意します…'
+    : '⏱ レシピを調理中…' + (aiMode==='key' ? '（🔑 APIキーモード：web検索で参考記事も探しています）' : '（☁️ Claude内モード：web検索で参考記事も探しています。30秒ほどお待ちください）');
+  out.style.display='none'; shareRow.style.display='none'; pBox.style.display='none'; pRow.style.display='none';
+  try{
+    const text = await callClaudeSmart([{role:'user', content:prompt}], true);
+    lastRecipeText = text;
+    st.innerHTML='⏱ レシピ完成🐰 <b>技術内容と参考記事URLの最終確認は人間の仕事</b>——一読してから受講生にシェアを。';
+    out.innerHTML = mdLite(text); out.style.display='block'; shareRow.style.display='flex';
+  }catch(e){
+    st.innerHTML = offlineHint(e) + ' 参考記事はその下の検索リンクからどうぞ。';
+    pBox.textContent = prompt; pBox.style.display='block'; pRow.style.display='flex';
+    renderRefLinks(input, hypo);
+  }
+}
+function mdLite(t){
+  let h = esc(t);
+  h = h.replace(/^## (.+)$/gm, '<div style="font-weight:700;color:var(--mush-deep);border-bottom:2px dashed var(--leaf-line);margin:12px 0 6px;padding-bottom:2px;">$1</div>');
+  h = h.replace(/\*\*(.+?)\*\*/g, '<b>$1</b>');
+  h = h.replace(/(https?:\/\/[^\s|）)」<]+)/g, '<a href="$1" target="_blank" rel="noopener" style="color:var(--leaf-deep);word-break:break-all;">$1</a>');
+  h = h.replace(/^(\d+)\. /gm, '<b style="color:var(--mush);">$1.</b> ');
+  h = h.replace(/^- /gm, '・');
+  return h.replace(/\n/g, '<br>');
+}
+function copyRecipeShare(){
+  if(!lastRecipeText) return;
+  const input = v('assistInput');
+  const pick = (name) => {
+    const m = lastRecipeText.match(new RegExp('## '+name+'[^\\n]*\\n([\\s\\S]*?)(?=\\n## |$)'));
+    return m ? m[1].trim() : '';
+  };
+  const share = `【ご質問】${input}\n\n【解説】\n${pick('ステップバイステップ解説')}\n\n【参考記事】\n${pick('受講生にシェアできる参考記事')}\n\n※わからない言葉があったら、いつでも聞いてくださいね🐰`;
+  const done = ()=>{ const c=document.getElementById('copiedToast'); c.classList.add('show'); setTimeout(()=>c.classList.remove('show'),1600); };
+  if(navigator.clipboard && navigator.clipboard.writeText){ navigator.clipboard.writeText(share).then(done).catch(()=>fallbackCopy(share,done)); }
+  else fallbackCopy(share,done);
+}
+function extractKeywords(input, hypo){
+  const text = (input+' '+(hypo||''));
+  const tech = text.match(/[A-Za-z][A-Za-z0-9 .+#-]{1,30}/g) || [];
+  const kata = text.match(/[ァ-ヴー]{3,}/g) || [];
+  const kanji = text.match(/[一-龠]{2,6}/g) || [];
+  const kws = [...new Set([...tech.map(s=>s.trim()), ...kata, ...kanji])].filter(k=>k.length>=2).slice(0,4);
+  return kws.length ? kws.join(' ') : text.slice(0,30);
+}
+function renderRefLinks(input, hypo){
+  const q = extractKeywords(input, hypo);
+  const enc = encodeURIComponent(q);
+  const world = S.meta.title ? encodeURIComponent(S.meta.title.slice(0,20)+' '+q) : enc;
+  const box = document.getElementById('refLinksOut');
+  box.innerHTML = `<div class="card" style="border-top-color:var(--leaf);">
+    <div class="meta">🔗 参考記事の検索リンク（検索ワード：${esc(q)}）— 開いて良記事を選び、URLを受講生にシェア</div>
+    <div style="font-size:.85rem;line-height:2.1;">
+      ・<a href="https://www.google.com/search?q=${enc}+入門" target="_blank" rel="noopener">Google：「${esc(q)} 入門」</a><br>
+      ・<a href="https://qiita.com/search?q=${enc}" target="_blank" rel="noopener">Qiita：「${esc(q)}」</a><br>
+      ・<a href="https://zenn.dev/search?q=${enc}" target="_blank" rel="noopener">Zenn：「${esc(q)}」</a><br>
+      ・<a href="https://www.google.com/search?q=${world}+site%3Adocs.aws.amazon.com" target="_blank" rel="noopener">公式ドキュメント検索（AWS Docs内）</a><br>
+      ・<a href="https://www.google.com/search?q=${enc}+%E5%9B%B3%E8%A7%A3" target="_blank" rel="noopener">Google：「${esc(q)} 図解」（文系向けの絵がある記事探し）</a>
+    </div>
+    <div class="kw">🐰 シェア前にひと目チェック：①内容が正確か ②受講生のレベルに合うか ③日付が古すぎないか</div>
+  </div>`;
+  box.style.display='block';
+}
+function showRefLinks(){
+  const input = v('assistInput');
+  const st = document.getElementById('recipeStatus');
+  if(!input){ st.style.display='block'; st.innerHTML='上の欄に受講生の質問を入力してください🐰'; return; }
+  st.style.display='none';
+  document.getElementById('recipeOut').style.display='none';
+  document.getElementById('recipePrompt').style.display='none';
+  document.getElementById('recipePromptRow').style.display='none';
+  document.getElementById('recipeShareRow').style.display='none';
+  renderRefLinks(input, v('recipeHypo'));
+}
+
+/* ================= サンプル（空っぽのとき各タブから入れられる） ================= */
+const SAMPLE_SETTINGS = {
+  title:'クラウドインフラ設計演習（AWS）', world:'商店街のお店',
+  cats:'VPC・サブネット, ELB, EC2, Auto Scaling, RDS, セキュリティ, 構成図',
+  count:'60〜70', memo:'文系・未経験7割。最終日に構成図の発表会あり。'
+};
+const SAMPLE_DATA = {
+  questions:[
+    {category:'VPC・サブネット',level:'初級',question:'VPCって何ですか？',bunkei:'AWSの中に借りる自分専用の敷地。この敷地の中にお店（サーバー）を建てていきます。',rikei:'論理的に分離された仮想ネットワーク空間。CIDRブロックでIPアドレス範囲を定義し、その中にサブネットを切る。',keywords:'VPC 仮想ネットワーク 敷地 ネットワーク'},
+    {category:'VPC・サブネット',level:'初級',question:'パブリックとプライベートの違いは？',bunkei:'表通りに面した売り場（誰でも入れる）か、関係者専用の裏方（外から入れない）かの違い。',rikei:'ルートテーブルにIGWへのルート（0.0.0.0/0→IGW）があればパブリック、なければプライベート。',keywords:'パブリック プライベート 公開 非公開 違い'},
+    {category:'ELB',level:'初級',question:'ELBは何をしてくれるの？',bunkei:'入口の案内係。行列のお客さまを、空いているお店へ順番に案内してくれます。',rikei:'複数ターゲットへのトラフィック分散とヘルスチェック。異常なインスタンスは振り分けから自動で外す。',keywords:'ELB ロードバランサー 振り分け 分散 案内'},
+    {category:'EC2',level:'初級',question:'EC2とは？',bunkei:'敷地の中に建てるお店そのもの。お店の大きさ（性能）は後から変えられます。',rikei:'仮想サーバー。インスタンスタイプでCPU/メモリを選択し、AMIからOSごと起動する。',keywords:'EC2 サーバー インスタンス 仮想マシン'},
+    {category:'Auto Scaling',level:'中級',question:'Auto Scalingは減るときもある？',bunkei:'行列ができたら臨時店舗を開き、空いたら閉店する出店ルール。増える方も減る方も自動です。',rikei:'スケールアウトとスケールイン双方をポリシーで制御。CloudWatchメトリクスをトリガーに希望容量を増減する。',keywords:'AutoScaling オートスケーリング 自動 増減 スケールイン 縮退'},
+    {category:'RDS',level:'中級',question:'リードレプリカって何のため？',bunkei:'裏方の台帳係の「写し」。読むだけのお客さまには写しを見せて、本物の台帳の混雑を減らします。',rikei:'非同期レプリケーションの読み取り専用DB。参照系クエリをオフロードして書き込み主系の負荷を下げる。',keywords:'リードレプリカ レプリカ 読み取り 参照 負荷分散'},
+    {category:'セキュリティ',level:'上級',question:'セキュリティグループとNACLの違いは？',bunkei:'お店ごとの用心棒（中に入る人を覚えている）と、区画の門番（通る人を毎回両方向チェック）の違い。',rikei:'SGはインスタンス単位・ステートフル、NACLはサブネット単位・ステートレスで戻り通信も明示が必要。',keywords:'セキュリティグループ NACL SG ファイアウォール 違い ステートフル'},
+    {category:'構成図',level:'発表',question:'構成図はどこから描き始めればいい？',bunkei:'外側から。まず敷地（VPC）の枠、次に区画（サブネット）、最後にお店（EC2など）の順で描くと迷子になりません。',rikei:'境界→ネットワーク→リソースの順。AZをまたぐ冗長構成は左右対称に配置すると経路が読みやすい。',keywords:'構成図 描き方 図 順番 発表'}
+  ],
+  discussions:[
+    {timing:'発表後すぐ',question:'この構成で、片方のAZがまるごと落ちたら何が起きますか？',guide:'ユーザーのリクエストを入口から順に追ってみてください',expected:'ELBが生きているAZへ振り分け、サービスは継続。RDSはフェイルオーバーで昇格。',aim:'冗長化の意味を自分の構成図で確認させる'},
+    {timing:'時間調整用',question:'もし予算が半分になったら、どこから削りますか？',guide:'「止まっても困らないもの」はどれでしょう？',expected:'検証環境の縮小、夜間停止、インスタンスサイズ見直しなど。可用性要件とのトレードオフに言及できれば満点。',aim:'コストと可用性のバランス感覚を引き出す'}
+  ],
+  advanced:[
+    {place:'入口（LBの前）',item:'AWS WAF',aim:'SQLi・XSS等の攻撃パターンを遮断する'},
+    {place:'記録',item:'CloudTrail（検証ON）',aim:'全API操作を保存し、改ざん検知まで備える'}
+  ],
+  hints:[
+    {type:'描く順番',content:'①VPCの枠 → ②AZとサブネット → ③入口（IGW/ELB）→ ④お店（EC2）→ ⑤裏方（RDS）'},
+    {type:'部品チェックリスト',content:'VPC／サブネット×4／IGW／ELB／EC2×2／RDS（マルチAZ）／SG が揃っているか'}
+  ],
+  instructorHints:[
+    {stage:'ヒント1（考え方）',content:'「お客さまはどこから入ってきますか？」と入口から考えさせる'},
+    {stage:'ヒント2（経路）',content:'「入口→案内係→お店→台帳係、の順に線をつないでみましょう」'},
+    {stage:'ヒント3（ほぼ答え）',content:'「ELBは2つのAZのEC2両方に矢印が伸びていればOKです」'}
+  ]
+};
+const SAMPLE_ASSIST = {q:'サーバーが増えるやつって、勝手に減ったりもするんですか？', hypo:'たぶんAuto Scalingのスケールイン（縮退）の話'};
+const SAMPLE_IMPORT_JSON = JSON.stringify({meta:{title:SAMPLE_SETTINGS.title, world:SAMPLE_SETTINGS.world},
+  questions:SAMPLE_DATA.questions.slice(0,3), discussions:SAMPLE_DATA.discussions.slice(0,1),
+  advanced:[], hints:[], instructorHints:[]}, null, 2);
+
+function applySampleSettings(){
+  set('inTheme',SAMPLE_SETTINGS.title); set('inWorld',SAMPLE_SETTINGS.world);
+  set('inCats',SAMPLE_SETTINGS.cats); set('inMemo',SAMPLE_SETTINGS.memo);
+  document.getElementById('inCount').value = SAMPLE_SETTINGS.count;
+  saveSettings(); buildPrompts(); toast('🍄 サンプル設定を入れました');
+}
+function loadSampleData(){
+  for(const k of Object.keys(SAMPLE_DATA)) S[k] = JSON.parse(JSON.stringify(SAMPLE_DATA[k]));
+  if(!S.meta.title){ Object.assign(S.meta, SAMPLE_SETTINGS); loadSettingsToForm(); }
+  autosave(); renderStats(); renderAllTables(); runSearch();
+  toast('🍄 サンプルデータ一式を入れました（自由に編集・削除OK）');
+}
+function loadSampleRows(key){
+  S[key] = S[key].concat(JSON.parse(JSON.stringify(SAMPLE_DATA[key] || [])));
+  renderTable(key); autosave(); renderStats();
+  toast('🍄 サンプル行を入れました');
+}
+function fillSampleImport(){
+  document.getElementById('importArea').value = SAMPLE_IMPORT_JSON;
+  toast('🍄 サンプルJSONを貼りました。「読み込む」を押してみてください');
+}
+function fillSampleAssist(){
+  document.getElementById('assistInput').value = SAMPLE_ASSIST.q;
+  const h = document.getElementById('recipeHypo'); if(h) h.value = SAMPLE_ASSIST.hypo;
+  toast('🍄 サンプル質問を入れました');
+}
+function toast(msg){
+  const c = document.getElementById('copiedToast');
+  c.textContent = msg; c.classList.add('show');
+  setTimeout(()=>{ c.classList.remove('show'); c.textContent='📋 コピーしました！'; }, 1800);
+}
+function settingsEmpty(){ return !(S.meta.title || S.meta.world || S.meta.cats || S.meta.memo); }
+function renderEmptyHints(){
+  const show = (id, cond) => { const el = document.getElementById(id); if(el) el.style.display = cond ? '' : 'none'; };
+  show('sampleSettingsBtn', settingsEmpty());
+  show('samplePromptBtn', settingsEmpty());
+  show('sampleExportHint', !S.questions.length);
+}
+
+/* ================= 内蔵サンプル（何もないとき用・各タブから投入可） ================= */
+const SAMPLE = {
+  meta: { title:'クラウドインフラ設計演習（AWS）', world:'商店街のお店',
+          cats:'VPC・サブネット, AZ・可用性, ELB, EC2, Auto Scaling, RDS, セキュリティ, 構成図',
+          count:'60〜70', memo:'文系・未経験7割。最終日に構成図の発表会あり。' },
+  questions: [
+    {category:'VPC・サブネット',level:'初級',question:'VPCって何ですか？',bunkei:'AWSという大きな商店街の中に借りる、自分専用の敷地です。敷地の中にお店（サーバー）を建てていきます。',rikei:'論理的に分離された仮想ネットワーク空間。CIDRブロックでIPアドレス範囲を定義し、その中にサブネットを切っていきます。',keywords:'VPC 仮想ネットワーク 敷地 ぶいぴーしー',refBunkei:'検索：VPC とは 図解 入門',refRikei:'AWS公式 VPCユーザーガイド https://docs.aws.amazon.com/vpc/'},
+    {category:'VPC・サブネット',level:'初級',question:'パブリックとプライベートの違いは？',bunkei:'表通りに面した売り場（誰でも入れる）か、関係者専用の裏方（外から入れない）かの違いです。',rikei:'ルートテーブルにIGWへのルート（0.0.0.0/0→IGW）があればパブリック、なければプライベートです。',keywords:'パブリック プライベート 公開 非公開 違い'},
+    {category:'AZ・可用性',level:'中級',question:'なぜAZを2つ使うんですか？',bunkei:'1つの建物が停電してもお店を続けられるよう、離れた場所に支店を出しておくのと同じです。',rikei:'単一AZ障害への耐性のため。マルチAZ構成でELB/RDSのフェイルオーバーが機能し、可用性が上がります。',keywords:'AZ マルチAZ 可用性 冗長 なぜ 2つ'},
+    {category:'ELB',level:'初級',question:'ELBは何をしてるんですか？',bunkei:'入口に立つ案内係さんです。空いているお店（サーバー）へお客さまを順番に振り分けます。',rikei:'複数ターゲットへのトラフィック分散。ヘルスチェックで異常なインスタンスを切り離します。',keywords:'ELB ロードバランサー 振り分け 案内 負荷分散',refBunkei:'検索：ロードバランサー 仕組み 図解',refRikei:'AWS公式 ELBドキュメント https://docs.aws.amazon.com/elasticloadbalancing/'},
+    {category:'EC2',level:'初級',question:'EC2とは何ですか？',bunkei:'敷地の中に建てるお店そのものです。お店の大きさ（スペック）は後から変えられます。',rikei:'仮想サーバー（インスタンス）。インスタンスタイプでCPU/メモリを選び、AMIからOSごと起動します。',keywords:'EC2 サーバー インスタンス いーしーつー'},
+    {category:'Auto Scaling',level:'中級',question:'Auto Scalingは勝手に減ったりもするんですか？',bunkei:'行列ができたら臨時店舗を自動で開店し、お客さまが減ったら閉店する「出店ルール」です。増えるのも減るのも自動です。',rikei:'はい。CloudWatchメトリクスに基づきスケールアウト／スケールイン両方を行います。最小・最大・希望台数で制御します。',keywords:'AutoScaling オートスケーリング 自動 増減 スケールイン 減る',refBunkei:'検索：オートスケーリング 仕組み 図解',refRikei:'AWS公式 Auto Scalingドキュメント https://docs.aws.amazon.com/autoscaling/'},
+    {category:'RDS',level:'上級',question:'リードレプリカとは何ですか？',bunkei:'台帳係の隣に「読む専用のコピー台帳」を置いて、閲覧のお客さまをそちらに案内するイメージです。',rikei:'非同期レプリケーションで作る読み取り専用DB。読み取り負荷の分散用で、自動フェイルオーバー用のスタンバイとは別物です。',keywords:'リードレプリカ レプリカ 読み取り 複製 参照'},
+    {category:'セキュリティ',level:'中級',question:'セキュリティグループって何ですか？',bunkei:'お店ごとに付ける入口の警備員さんです。「どこから来た・何の用事のお客さまを通すか」のリストを持っています。',rikei:'インスタンス単位のステートフルなファイアウォール。許可ルールのみ記述でき、戻りの通信は自動許可されます。',keywords:'セキュリティグループ SG ファイアウォール 警備'},
+    {category:'構成図',level:'発表',question:'構成図はどこから描き始めればいいですか？',bunkei:'外側の大きな箱（敷地）から描いて、だんだん内側のお店へ。住所を決めてから家具を置く順番です。',rikei:'VPC→AZ→サブネット→リソースの順に外側から。最後にユーザーからの通信経路を矢印で1本通すと検証しやすいです。',keywords:'構成図 描き方 順番 書き方 発表'},
+    {category:'構成図',level:'発表',question:'この構成で片方のAZが落ちたらどうなりますか？',bunkei:'片方の建物が停電しても、案内係がもう一方の支店へお客さまを通すので営業は続きます。',rikei:'ELBのヘルスチェックが異常を検知して残存AZへ振り分け、RDSはスタンバイへフェイルオーバーします。',keywords:'AZ障害 落ちたら フェイルオーバー 片方 災害'}
+  ],
+  discussions: [
+    {timing:'発表後すぐ',question:'夜中の2時にEC2が1台壊れたら、誰が気づいて誰が直しますか？',guide:'「人」ではなく「仕組み」で考えると？',expected:'ヘルスチェックで切り離し→Auto Scalingが代替を自動起動。人の出動は原則ゼロ。',aim:'「人ではなく仕組み」の体感'},
+    {timing:'時間調整用',question:'このサイトをHTTPS化するとき、証明書はどこに置きますか？',guide:'「暗号を解く作業はどこでまとめてやると楽？」',expected:'ACMの証明書をELBに置いてTLS終端。EC2が増えても証明書管理は1か所。',aim:'TLS終端の理解'},
+    {timing:'時間調整用',question:'来月「同じ環境をもう1セット作って」と言われたらどうしますか？',guide:'手順書とコードならどちらが正確に再現できる？',expected:'IaC（CloudFormation/Terraform）でコード化すれば再現可能でレビューもできる。',aim:'IaCへの興味づけ'}
+  ],
+  advanced: [
+    {place:'入口（LBの前）',item:'AWS WAF',aim:'SQLi・XSS等の攻撃パターンを遮断'},
+    {place:'認証情報',item:'Secrets Manager',aim:'DBパスワードをコードに直書きしない'},
+    {place:'記録',item:'CloudTrail',aim:'全API操作を保存し、事後検証できるようにする'}
+  ],
+  hints: [
+    {type:'描く順番',content:'①VPC（敷地）→ ②AZ → ③サブネット → ④お店たち → ⑤お客さまの矢印を1本通す'},
+    {type:'チェックリスト',content:'入口の案内係はいる？／裏方は隠した？／支店（もう1つのAZ）はある？'}
+  ],
+  instructorHints: [
+    {stage:'ヒント1（考え方）',content:'「お客さまが来てから画面が出るまで」を口で説明してもらう'},
+    {stage:'ヒント2（経路）',content:'ユーザー→？→？→DBの「？」を一緒に埋める'},
+    {stage:'ヒント3（ほぼ答え）',content:'ELBとEC2の箱だけ先に描いてあげて、線を引いてもらう'}
+  ]
+};
+function loadSampleAll(){
+  const hasData = S.questions.length || S.discussions.length;
+  if(hasData && !confirm('すでにデータがあります。サンプルを「追記」しますか？\n（OK＝追記／キャンセル＝中止）')) return;
+  if(!hasData){ S.meta = Object.assign({}, S.meta, SAMPLE.meta); }
+  for(const k of ['questions','discussions','advanced','hints','instructorHints']){
+    S[k] = S[k].concat(JSON.parse(JSON.stringify(SAMPLE[k])));
+  }
+  loadSettingsToForm(); autosave(); renderStats(); renderAllTables(); buildPrompts();
+  const t = document.getElementById('copiedToast'); t.textContent='🎁 サンプルを入れました！';
+  t.classList.add('show'); setTimeout(()=>{t.classList.remove('show'); t.textContent='📋 コピーしました！';},1800);
+}
+function loadSampleMeta(){
+  S.meta = Object.assign({}, S.meta, SAMPLE.meta);
+  loadSettingsToForm(); autosave(); renderStats(); buildPrompts();
+}
+function insertSampleSection(key){
+  S[key] = S[key].concat(JSON.parse(JSON.stringify(SAMPLE[key])));
+  renderTable(key); autosave(); renderStats();
+}
+function insertSampleImport(){
+  document.getElementById('importArea').value =
+    '```json\n' + JSON.stringify({meta:SAMPLE.meta, questions:SAMPLE.questions, discussions:SAMPLE.discussions,
+      advanced:SAMPLE.advanced, hints:SAMPLE.hints, instructorHints:SAMPLE.instructorHints}, null, 1) + '\n```';
+}
+function insertSampleAssist(){
+  if(!S.questions.length) loadSampleAll();
+  document.getElementById('assistInput').value = 'サーバーが増えるやつって、勝手に減ったりもするんですか？';
+  const hypo = document.getElementById('recipeHypo'); if(hypo) hypo.value = 'たぶんAuto Scalingのスケールインのこと';
+  runAssist();
+}
+function insertSampleSearch(){
+  if(!S.questions.length) loadSampleAll();
+  document.getElementById('searchBox').value = 'レプリカ';
+  runSearch();
+}
+
+/* ================= プロンプトの出力（md／PDF／CSV）とタブ内検索 ================= */
+const PROMPT_LABEL = { new:'新規作成用', excel:'Excel添付用' };
+function promptMeta(key){
+  return { label: PROMPT_LABEL[key],
+    theme: S.meta.title || '（テーマ未設定）', world: S.meta.world || '（世界観未設定）',
+    state: S.prompts[key] ? '✏️ 編集版' : '⚙️ 自動生成',
+    text: document.getElementById(PROMPT_DEFS[key].el).value,
+    date: new Date().toLocaleString('ja-JP') };
+}
+function safeName(s){ return (s||'プロンプト').replace(/[\\/:*?"<>|]/g,'_').slice(0,40); }
+function downloadPromptMd(key){
+  const m = promptMeta(key);
+  const md = `# 🍄 AIプロンプトメモ（${m.label}）
+
+- テーマ：${m.theme}
+- たとえの世界観：${m.world}
+- 状態：${m.state}
+- 保存日時：${m.date}
+- 出典：想定質問集ジェネレーター（うさうさ研修工房）
+
+## プロンプト本文（このままAIに貼り付け）
+
+\`\`\`
+${m.text}
+\`\`\`
+`;
+  download(`AIプロンプト_${m.label}_${safeName(S.meta.title)}.md`, md, 'text/markdown');
+}
+function csvCell(s){
+  let t = str(s);
+  if(/^[=+@-]/.test(t)) t = "'" + t;   // CSVインジェクション対策（Excelでの数式実行を防止）
+  return '"' + t.replace(/"/g,'""') + '"';
+}
+function downloadPromptsCsv(){
+  const rows = [['種別','テーマ','たとえの世界観','状態','保存日時','プロンプト本文']];
+  for(const key of ['new','excel']){
+    const m = promptMeta(key);
+    rows.push([m.label, m.theme, m.world, m.state, m.date, m.text]);
+  }
+  const csv = '\ufeff' + rows.map(r=>r.map(csvCell).join(',')).join('\r\n');
+  download(`AIプロンプト管理_${safeName(S.meta.title)}.csv`, csv, 'text/csv');
+}
+function downloadPromptPdf(key){
+  const m = promptMeta(key);
+  const win = window.open('', '_blank');
+  if(!win){ alert('ポップアップがブロックされました。このサイトのポップアップを許可してください🐰'); return; }
+  win.document.write(`<!DOCTYPE html><html lang="ja"><head><meta charset="UTF-8">
+<title>AIプロンプト（${m.label}）｜${esc(m.theme)}</title>
+<style>
+ body{font-family:'Hiragino Maru Gothic ProN','Yu Gothic','Meiryo',sans-serif;background:#FFF7E8;color:#4A3424;margin:24px;}
+ .band{background:linear-gradient(135deg,#E8867B,#E8B94A);color:#fff;border-radius:12px;padding:14px 18px;margin-bottom:14px;}
+ .band h1{font-size:18px;margin:0;} .band .sub{font-size:11px;opacity:.95;margin-top:4px;}
+ .meta{font-size:11px;color:#8A5A3B;background:#FFF2DC;border:1.5px dashed #E8B94A;border-radius:10px;padding:8px 12px;margin-bottom:12px;}
+ pre{white-space:pre-wrap;word-break:break-word;background:#fff;border:2px solid #F6DFA4;border-radius:12px;padding:14px;font-size:11.5px;line-height:1.7;font-family:inherit;}
+ footer{text-align:center;font-size:10px;color:#9C7A55;margin-top:12px;}
+ @media print{ body{background:#fff;} }
+</style></head><body>
+<div class="band"><h1>🍄 AIプロンプト（${m.label}）</h1><div class="sub">${esc(m.theme)}｜うさうさ研修工房 🐰</div></div>
+<div class="meta">たとえの世界観：${esc(m.world)}　｜　状態：${m.state}　｜　保存日時：${m.date}</div>
+<pre>${esc(m.text)}</pre>
+<footer>印刷ダイアログで「PDFに保存」を選んでください ｜「面白きこともなき世を面白く」</footer>
+<script>window.onload = ()=>{ setTimeout(()=>window.print(), 300); };<\/script>
+</body></html>`);
+  win.document.close();
+}
+/* --- タブ内検索（2つのプロンプトを横断・一致箇所へジャンプ） --- */
+document.getElementById('promptSearch').addEventListener('input', runPromptSearch);
+function runPromptSearch(){
+  const kw = v('promptSearch').toLowerCase();
+  const cnt = document.getElementById('promptSearchCount');
+  const out = document.getElementById('promptSearchResults');
+  if(!kw){ cnt.style.display='none'; out.innerHTML=''; return; }
+  const hits = [];
+  for(const key of ['new','excel']){
+    const text = document.getElementById(PROMPT_DEFS[key].el).value;
+    const low = text.toLowerCase();
+    let i = low.indexOf(kw);
+    while(i !== -1 && hits.length < 60){
+      const lineNo = text.slice(0, i).split('\n').length;
+      const ls = text.lastIndexOf('\n', i) + 1;
+      let le = text.indexOf('\n', i); if(le === -1) le = text.length;
+      hits.push({key, start:i, len:kw.length, lineNo, line:text.slice(ls, le).trim()});
+      i = low.indexOf(kw, i + kw.length);
+    }
+  }
+  cnt.style.display='block';
+  cnt.textContent = hits.length ? `${hits.length} 件ヒット（クリックでその場所へジャンプ）` : '0 件——表記ゆれ（カタカナ／英字）も試してみてください🐰';
+  out.innerHTML = hits.slice(0, 30).map((x,i)=>
+    `<div class="card" style="padding:7px 12px;margin-bottom:6px;cursor:pointer;border-top-width:4px;${x.key==='excel'?'border-top-color:var(--honey);':''}"
+          onclick="jumpToPrompt('${x.key}',${x.start},${x.len})">
+       <span class="meta">${x.key==='new'?'①新規':'②Excel'}　${x.lineNo}行目</span><br>
+       <span style="font-size:.82rem;">${hl(esc(x.line), kw)}</span>
+     </div>`).join('');
+}
+function jumpToPrompt(key, start, len){
+  const ta = document.getElementById(PROMPT_DEFS[key].el);
+  ta.focus();
+  ta.setSelectionRange(start, start + len);
+  const lh = parseFloat(getComputedStyle(ta).lineHeight) || 18;
+  const line = ta.value.slice(0, start).split('\n').length;
+  ta.scrollTop = Math.max(0, (line - 4) * lh);
+  if(ta.scrollIntoView) ta.scrollIntoView({behavior:'smooth', block:'center'});
+}
+
+/* ================= 一気通貫（プロンプト→AI→取り込み→確認→出力） ================= */
+async function runPipeline(){
+  const st = document.getElementById('pipeStatus'), verify = document.getElementById('pipeVerify');
+  st.style.display='block'; verify.style.display='none';
+  let prompt = document.getElementById('promptNew').value;
+  const cnt = v('pipeCount');
+  if(cnt) prompt += `\n\n※今回は質問数を${cnt}問に減らして出力してください（その他の仕様・出力形式は同じです）。`;
+  if(aiMode==='manual'){
+    st.innerHTML = '✍️ 手動モードです。上の「📋 プロンプトをコピー」でAIに貼り付け、返ってきたJSONを「📥 インポート」タブに貼ってください🐰（一気通貫はAI接続モード ☁️／🔑 で使えます）';
+    return;
+  }
+  st.innerHTML = '🚀 AIが想定質問集を調理中…' + (cnt==='10' ? '（お試し10問：1分前後）' : '（フル生成は数分かかることがあります。このまま待っていてください）');
+  try{
+    const text = await callClaudeSmart([{role:'user', content:prompt}], false, 16000);
+    let raw = text.replace(/^```(json)?/m,'').replace(/```\s*$/m,'').trim();
+    const a = raw.indexOf('{'), b = raw.lastIndexOf('}');
+    if(a>=0 && b>a) raw = raw.slice(a, b+1);
+    const d = JSON.parse(raw);
+    const inc = normalizeImport(d);
+    if(!inc.questions.length) throw new Error('質問データが含まれていませんでした');
+    applyImport(inc, v('pipeApply')==='append', d.meta);
+    st.innerHTML = `🚀 取り込み完了🐰 ${importCounts(inc)}<br><b>理系向け回答と参考記事URLのレビューは人間の仕事</b>——下のミニ検索で中身を覗いてから、編集タブでチェックを。`;
+    verify.style.display='block';
+    document.getElementById('pipeSearch').value=''; runPipeSearch();
+  }catch(e){
+    if(e.manual || e.needKey){ st.innerHTML = offlineHint(e); return; }
+    if(e instanceof SyntaxError){
+      st.innerHTML = 'AIの出力をJSONとして読めませんでした（長すぎて途切れた可能性があります）。<b>「🎈 お試し10問」でもう一度</b>試すか、フル生成は「📋 コピー」→お使いのAI→「📥 インポート」のコピペ運用が確実です🐰';
+      return;
+    }
+    st.innerHTML = offlineHint(e);
+  }
+}
+document.getElementById('pipeSearch').addEventListener('input', runPipeSearch);
+function runPipeSearch(){
+  const kw = v('pipeSearch').trim().toLowerCase();
+  const hc = document.getElementById('pipeHit'), out = document.getElementById('pipeResults');
+  if(!kw){
+    hc.textContent = `現在 ${S.questions.length} 問。キーワードでヒットを確認できます（例：なぜ、図解、${esc(S.meta.world||'世界観の言葉')}）`;
+    out.innerHTML = S.questions.slice(0,2).map((q,i)=>buildQCard(q,i,'')).join('');
+    return;
+  }
+  const hits = S.questions.map((q,i)=>({q,i})).filter(({q})=>
+    [q.category,q.level,q.question,q.bunkei,q.rikei,q.keywords,q.refBunkei,q.refRikei].join(' ').toLowerCase().includes(kw));
+  hc.textContent = `${hits.length} 件ヒット`;
+  out.innerHTML = hits.slice(0,10).map(({q,i})=>buildQCard(q,i,kw)).join('') ||
+    '<div class="note">ヒットなし。世界観のたとえ語やカテゴリ名でも試してみてください🐰</div>';
+}
+
+/* ================= プロンプトのExcel保存（台帳） ================= */
+function downloadPromptsExcel(){
+  const rows = [['種別','テーマ','たとえの世界観','状態','保存日時','プロンプト本文'].map(x=>xT(x,1))];
+  for(const key of ['new','excel']){
+    const m = promptMeta(key);
+    rows.push([xT(m.label), xT(m.theme), xT(m.world), xT(m.state.replace(/^[^ ]+ /,'')), xT(m.date), xT(m.text,2)]);
+  }
+  download(`AIプロンプト管理_${safeName(S.meta.title)}.xlsx`,
+    buildXlsx([{name:'AIプロンプト台帳', widths:[12,24,16,10,17,90], rows}]), XLSX_MIME);
+}
+
+
+/* ================= 記事工房（記事リーダー・数式ジェネレーター） ================= */
+const ARTICLE_MD = `# 🐰研修講師の味方「想定質問集Excel」の作り方 〜文系にはたとえで、理系には技術で答える〜
+
+#IT研修 #講師 #Excel #AI活用 #教材作成
+
+---
+
+こんにちは、うさうさ先生🐰です。
+
+IT研修の講師をしていると、受講生からの質問って本当にさまざまです。同じ「VPCって何ですか？」という質問でも、文系・未経験の方と、理系・経験者の方とでは、しっくりくる答え方がぜんぜん違うんですよね。
+
+そこで私は、研修の前に「想定質問集Excel」を作っています。1つの質問に対して、**文系向けの回答（たとえで）** と **理系向けの回答（技術で）** を2列で用意しておくスタイルです。
+
+今日はこのExcelの作り方を、
+
+①AIに読み込ませてカスタマイズする方法（時短ルート）
+②手動でゼロから作る方法（仕組み理解ルート）
+
+の2本立てでご紹介します🐰
+
+---
+
+## なぜ作るの？（WHY）
+
+**一言でいうと、「当日その場で考えなくていい状態」を作るためです。**
+
+研修の現場は生ものです。進行を追いかけながら、質問にその場で最適な答えを組み立てるのは、ベテランでも結構な負荷がかかります。サブ講師として入る場合はなおさらです。
+
+事前に質問と回答をデータベース化しておけば、
+
+- 質問が来たらキーワード検索で数秒で引ける
+- 文系の方には「たとえ」、理系の方には「技術用語」と、相手に合わせて答え分けられる
+- 研修後に実際に出た質問を追記すれば、次回はもっと強い武器になる
+
+つまり、**人の頑張りではなく仕組みで品質を守る**ことができます。これ、私が教材づくりでいちばん大事にしている考え方です🐰
+
+---
+
+## どんなExcelなの？（WHAT）
+
+シートは5枚構成です。
+
+- **検索シート**：黄色のセルにキーワードを入れると、該当する質問と回答がずらっと並びます（部分一致・関数だけで動きます）
+- **質問集DBシート**：本体。約70問を「カテゴリ／レベル／質問／文系向け回答／理系向け回答／キーワード」で管理
+- **議論質問シート**：発表やグループワークの後に議論を深めるための質問。「質問→誘導→期待する解答」を小出しにできる設計
+- **発展シート**：テーマに応じた一歩先の内容（例：セキュリティ対策をどこに足すか）
+- **ヒントシート**：上段は受講生に見せてよいヒント、下段は講師専用の段階ヒント
+
+レベルは「初級／中級／上級／発表」の4区分にしています。
+
+そして大事なのが、**たとえの世界観を1つに統一すること**。
+
+たとえばAWSの研修なら、こんな感じです。
+
+- VPC＝AWSの中に借りる自分専用の **敷地**
+- EC2＝敷地の中に建てる **お店**
+- ELB＝入口の **案内係**（空いている店舗へお客さまを振り分ける）
+- RDS＝裏方の **台帳係**（金庫は奥に置く）
+- Auto Scaling＝行列ができたら臨時店舗を開く **出店ルール**
+
+質問ごとにたとえがバラバラだと、受講生の頭の中で絵がつながりません。世界観を1つに決めて、全部の質問をその世界で答えるのがコツです🐰
+
+---
+
+## 作り方①：AIに読み込ませてカスタマイズ（HOW・時短ルート）
+
+すでに1つファイルがあるなら、これが最速です。AI（私はClaudeを使っています）にExcelをアップロードして、構造はそのまま、中身だけ別テーマに差し替えてもらいます。
+
+### 手順
+
+1. 既存の想定質問集Excelをアップロード
+2. 下のプロンプトのテーマ部分だけ書き換えて送信
+3. 生成されたExcelをダウンロードして、検索機能の動作確認
+4. **理系向け回答の技術的な正確性を、必ず自分の目でレビュー**（ここはサボらない！）
+5. 固有名詞や個人情報が入っていないか確認して完成
+
+### コピペ用プロンプト
+
+\`\`\`
+添付のExcel「想定質問集」と同じ構造・同じ数式の仕組みで、
+テーマを【★例：DNSサーバー構築演習】向けに作り直してください。
+
+維持してほしいこと：
+- 5シート構成（検索／質問集DB／議論質問／発展／ヒント）
+- 質問集DBの列構成（No／カテゴリ／レベル／質問／文系向け回答（たとえで）／
+  理系向け回答（技術で）／キーワード／検索用／ヒット）
+- 検索シートの仕組み（FILTER関数を使わず、ヒット連番＋INDEX/MATCH方式。
+  古いExcelでも動くようにするため）
+- レベルは「初級／中級／上級／発表」の4区分
+- 文系向け回答のたとえは【★例：ラーメン店】の世界観で全問統一すること
+- キーワード列には表記ゆれ・同義語（カタカナ／略語）を登録すること
+
+質問数は60〜70問、カテゴリは6〜8個でお願いします。
+議論質問は「投げかける質問→誘導→期待する解答→ねらい」の4点セットで
+10問前後作ってください。
+\`\`\`
+
+### AI生成後のチェックリスト
+
+- 検索シートでキーワードを入れて、件数と一覧が出るか
+- たとえの世界観が全問で統一されているか
+- 理系向け回答に技術的な誤りがないか（公式ドキュメントと照合）
+- 固有名詞・個人情報が混入していないか
+
+AIはとても優秀ですが、細かい仕様や最新の変更はしれっと間違えます。**最後のレビューだけは人間の仕事**です🐰
+
+---
+
+## 作り方②：手動でゼロから作る（HOW・仕組み理解ルート）
+
+仕組みを一度自分の手で組んでおくと、AIが作ったものの修正やトラブル対応もできるようになります。心臓部だけ解説しますね。
+
+### Step 1：質問集DBシート
+
+1行目にヘッダーを作ります。
+
+A列：No ／ B列：カテゴリ ／ C列：レベル ／ D列：質問 ／ E列：文系向け回答（たとえで） ／ F列：理系向け回答（技術で） ／ G列：キーワード ／ H列：検索用 ／ I列：ヒット
+
+G列のキーワードには、同義語や表記ゆれを登録しておきます（例：「Route53 ルート53 DNS 名前解決」）。受講生は正式名称で質問してくれるとは限らないので、ここが検索のヒット率を決めます。
+
+**H列（全部を1つの文字列に連結）**
+
+\`\`\`
+=B2&" "&C2&" "&D2&" "&E2&" "&F2&" "&G2
+\`\`\`
+
+**I列（ヒットした行に上から1, 2, 3…と連番を振る）**
+
+\`\`\`
+=IF('検索'!$B$3="","",IF(ISNUMBER(SEARCH('検索'!$B$3,H2)),MAX(I$1:I1)+1,""))
+\`\`\`
+
+ここがこのツールの心臓部です。SEARCH関数は部分一致で、大文字小文字も区別しないので、「ec2」でも「EC2」でもヒットします。「自分より上のヒット数＋1」を振っていく、古典的ですが堅牢なやり方です。
+
+### Step 2：検索シート
+
+B3セルをキーワード入力欄にして（黄色く塗ると親切です）、ヒット件数を表示します。
+
+\`\`\`
+=IF($B$3="","← キーワードを入力",COUNT('質問集DB'!$I$2:$I$70)&" 件ヒット")
+\`\`\`
+
+結果一覧は、I列の連番をINDEX/MATCHで順に拾います。1件目はこちら。
+
+\`\`\`
+=IFERROR(INDEX('質問集DB'!A$2:A$70,MATCH(1,'質問集DB'!$I$2:$I$70,0)),"")
+\`\`\`
+
+2件目以降は、MATCHの最初の「1」を行ごとに2, 3, 4…と増やしてコピーしていきます。
+
+「FILTER関数を使えば1本で済むのでは？」と思った方、鋭いです。ただ、研修会場のPCはOfficeのバージョンが古いことがよくあるんです。**どの環境でも・オフラインでも動くこと**を優先して、あえてINDEX/MATCH方式にしています🐰
+
+### Step 3：議論質問シート
+
+質問をそのまま投げるのではなく、3段階で小出しにできる形にします。
+
+- **投げかける質問**：「この構成で、片方のデータセンターがまるごと落ちたら何が起きますか？」
+- **誘導（詰まったら）**：「ユーザーのリクエストを入口から順に追ってみてください」
+- **期待する解答**：講師が最終的に引き出したい結論
+
+「時間調整用」の質問を何問か用意しておくと、進行が早すぎた日・遅すぎた日の保険になって安心です。
+
+### Step 4：ヒントシート
+
+上段と下段で公開範囲を分けます。
+
+- 上段：受講生に投影・配布してよいヒント（描く順番、チェックリスト）
+- 下段：講師専用の段階ヒント（ヒント1＝考え方 → ヒント2＝経路 → ヒント3＝ほぼ答え）
+
+机間巡視のとき、詰まっている受講生にヒント1から順番に出せば、答えを教えすぎずに「自分で気づけた！」という体験を残せます。ここ、主体性を伸ばすうえでいちばん大事なところです🐰
+
+---
+
+## 一行まとめ🐰
+
+**「質問×（文系のたとえ／理系の技術）×レベル」のデータベースを1枚作って関数だけの検索を載せれば、当日その場で考えない仕組みが完成。横展開はAIに構造ごと読ませるのが最速です。**
+
+---
+
+## おまけ：運用のコツ
+
+- 個人情報や固有の案件情報はファイルに入れない（ひな型として使い回すため）
+- AI生成後の技術内容は必ず一次情報（公式ドキュメント）と照合する
+- 研修で実際に出た質問は、終わったその日にDBへ追記する。これを繰り返すと、あなただけの最強FAQに育ちます
+
+最後まで読んでくださってありがとうございました。「面白きこともなき世を面白く」、研修準備もちょっとした仕組みで楽しくしていきましょう🐰
+
+質問やリクエストがあれば、コメントでお気軽にどうぞ！
+`;
+function renderArticle(){
+  const lines = ARTICLE_MD.split('\n');
+  let html = '', inCode = false;
+  for(const line of lines){
+    if(line.trim().startsWith('```')){
+      html += inCode ? '</pre>' : '<pre class="prompt-box" style="max-height:none;font-size:.74rem;">';
+      inCode = !inCode; continue;
+    }
+    if(inCode){ html += esc(line) + '\n'; continue; }
+    let t = esc(line);
+    t = t.replace(/\*\*(.+?)\*\*/g, '<b>$1</b>');
+    if(/^---\s*$/.test(line)) { html += '<hr style="border:none;border-top:2px dashed var(--honey-soft);margin:14px 0;">'; continue; }
+    if(t.startsWith('# '))   { html += `<div style="font-weight:700;font-size:1.05rem;color:var(--mush-deep);margin:10px 0;">${t.slice(2)}</div>`; continue; }
+    if(t.startsWith('## '))  { html += `<div style="font-weight:700;color:var(--mush-deep);border-bottom:2px dashed var(--leaf-line);margin:14px 0 6px;padding-bottom:2px;">${t.slice(3)}</div>`; continue; }
+    if(t.startsWith('### ')) { html += `<div style="font-weight:700;color:var(--leaf-deep);margin:10px 0 4px;">${t.slice(4)}</div>`; continue; }
+    if(t.startsWith('- '))   { html += `・${t.slice(2)}<br>`; continue; }
+    html += t ? t + '<br>' : '<div style="height:8px;"></div>';
+  }
+  document.getElementById('articleBody').innerHTML = html;
+}
+function copyArticle(){
+  const done = ()=>{ const c=document.getElementById('copiedToast'); c.classList.add('show'); setTimeout(()=>c.classList.remove('show'),1600); };
+  if(navigator.clipboard && navigator.clipboard.writeText){ navigator.clipboard.writeText(ARTICLE_MD).then(done).catch(()=>fallbackCopy(ARTICLE_MD,done)); }
+  else fallbackCopy(ARTICLE_MD,done);
+}
+function downloadArticleMd(){
+  download('note用_想定質問集Excelの作り方.md', ARTICLE_MD, 'text/markdown');
+}
+function genFormulas(){
+  const n = Math.max(1, parseInt(v('fxRows'),10) || 70);
+  const last = n + 1;
+  const fmt = v('fxFormat');
+  let items;
+  if(fmt === 'classic'){
+    items = [
+      ['H2（検索用：全部を1つの文字列に連結。H2に入れて下までコピー）',
+       '=B2&" "&C2&" "&D2&" "&E2&" "&F2&" "&G2'],
+      ['I2（ヒット：ヒット行に上から連番。I2に入れて下までコピー）',
+       `=IF('検索'!$B$3="","",IF(ISNUMBER(SEARCH('検索'!$B$3,H2)),MAX(I$1:I1)+1,""))`],
+      ['検索シートの件数表示（例：D3）',
+       `=IF($B$3="","← キーワードを入力",COUNT('質問集DB'!$I$2:$I$${last})&" 件ヒット")`],
+      ['検索シートの結果1件目（A列。2件目以降はMATCHの1を2,3,4…に）',
+       `=IFERROR(INDEX('質問集DB'!A$2:A$${last},MATCH(1,'質問集DB'!$I$2:$I$${last},0)),"")`]
+    ];
+  } else {
+    items = [
+      ['J2（検索用：参考記事2列も含めて連結。J2に入れて下までコピー）',
+       '=B2&" "&C2&" "&D2&" "&E2&" "&F2&" "&G2&" "&H2&" "&I2'],
+      ['K2（ヒット：ヒット行に上から連番。K2に入れて下までコピー）',
+       `=IF('検索'!$B$3="","",IF(ISNUMBER(SEARCH('検索'!$B$3,J2)),MAX(K$1:K1)+1,""))`],
+      ['検索シートの件数表示（例：D3）',
+       `=IF($B$3="","← キーワードを入力",COUNT('質問集DB'!$K$2:$K$${last})&" 件ヒット")`],
+      ['検索シートの結果1件目（A列。2件目以降はMATCHの1を2,3,4…に）',
+       `=IFERROR(INDEX('質問集DB'!A$2:A$${last},MATCH(1,'質問集DB'!$K$2:$K$${last},0)),"")`]
+    ];
+  }
+  document.getElementById('fxOut').innerHTML = items.map(([t,f],i)=>`
+    <div class="card" style="padding:10px 14px;">
+      <div class="meta">${t}</div>
+      <pre class="prompt-box" id="fx${i}" style="max-height:none;padding:8px 10px;font-size:.76rem;margin:6px 0;">${esc(f)}</pre>
+      <button class="btn btn-sub btn-mini" onclick="copyText('fx${i}')">📋 この数式をコピー</button>
+    </div>`).join('');
+}
+
+/* ================= レッスン記録（前＝準備／後＝実績） ================= */
+SCHEMA.qlog.extraBtn = (i,row)=> (row.note||'').includes('⭐昇格済')
+  ? `<span class="save-pill">⭐済 </span>`
+  : `<button class="btn btn-gold btn-mini" onclick="promoteLog(${i})" title="想定質問集DBへ追記">⭐昇格</button> `;
+function lessonMode(m){
+  document.getElementById('lessonPre').style.display  = m==='pre'  ? 'block':'none';
+  document.getElementById('lessonPost').style.display = m==='post' ? 'block':'none';
+  document.getElementById('modePre').className  = 'btn ' + (m==='pre' ?'btn-main':'btn-sub');
+  document.getElementById('modePost').className = 'btn ' + (m==='post'?'btn-main':'btn-sub');
+  if(m==='post') updateLogSummary();
+}
+['lsDate','lsTheme','lsCohort','lsMemo'].forEach((id,ix)=>{
+  const keys=['date','theme','cohort','memo'];
+  document.getElementById(id).addEventListener('change', e=>{ S.lessonInfo[keys[ix]] = e.target.value.trim(); autosave(); });
+});
+function loadLessonToForm(){
+  if(!S.lessonInfo) S.lessonInfo = {date:'',theme:'',cohort:'',memo:''};
+  set('lsDate', S.lessonInfo.date); set('lsTheme', S.lessonInfo.theme);
+  set('lsCohort', S.lessonInfo.cohort); set('lsMemo', S.lessonInfo.memo);
+}
+function nextQid(status){
+  const pre = QPREFIX[status] || 'BL';
+  let max = 0;
+  S.qlog.forEach(r=>{ const m = str(r.qid).match(new RegExp('^'+pre+'-(\\d+)$')); if(m) max = Math.max(max, parseInt(m[1],10)); });
+  return pre + '-' + String(max+1).padStart(3,'0');
+}
+function quickLog(){
+  const q = v('qkQuestion');
+  if(!q){ alert('出た質問を入力してください🐰'); return; }
+  const status = v('qkStatus');
+  S.qlog.push({ qid: nextQid(status), target: v('qkTarget'), level: v('qkLevel'),
+    question: q, answer: v('qkAnswer'), status, note:'' });
+  set('qkQuestion',''); set('qkAnswer','');
+  renderTable('qlog'); autosave(); renderStats(); updateLogSummary();
+  const t = document.getElementById('copiedToast'); t.textContent='📝 記録しました（'+S.qlog.at(-1).qid+'）';
+  t.classList.add('show'); setTimeout(()=>{t.classList.remove('show'); t.textContent='📋 コピーしました！';},1600);
+}
+function promoteLog(i){
+  const r = S.qlog[i]; if(!r) return;
+  S.questions.push({
+    category: S.lessonInfo.theme || 'レッスン実績',
+    level: LEVELS.includes(r.level) ? r.level : '初級',
+    question: r.question,
+    bunkei: r.target==='文系' ? r.answer : '',
+    rikei:  r.target==='理系' ? r.answer : (r.target==='文系' ? '' : r.answer),
+    keywords: extractKeywords(r.question, ''),
+    refBunkei:'', refRikei:''
+  });
+  r.note = str(r.note) + (r.note?' ':'') + '⭐昇格済';
+  renderTable('qlog'); renderAllTables(); autosave(); renderStats(); updateLogSummary();
+  const t = document.getElementById('copiedToast'); t.textContent='⭐ 想定質問集DBへ追記しました！（回答の文系/理系仕上げは編集タブで）';
+  t.classList.add('show'); setTimeout(()=>{t.classList.remove('show'); t.textContent='📋 コピーしました！';},2200);
+}
+function logCounts(){
+  const by = k => S.qlog.reduce((a,r)=>{a[r[k]]=(a[r[k]]||0)+1;return a;},{});
+  return { status: by('status'), target: by('target'), level: by('level'),
+           promoted: S.qlog.filter(r=>str(r.note).includes('⭐昇格済')).length };
+}
+function updateLogSummary(){
+  const c = logCounts();
+  const s = QSTATUS.map(st=>`${st.split(' ')[0]}${c.status[st]||0}`).join(' ');
+  document.getElementById('logSummary').textContent =
+    `全${S.qlog.length}件｜${s}｜文系${c.target['文系']||0}・理系${c.target['理系']||0}｜⭐昇格${c.promoted}`;
+}
+function lessonHead(){
+  const L = S.lessonInfo;
+  return { date: L.date || new Date().toLocaleDateString('ja-JP'),
+           theme: L.theme || S.meta.title || '（テーマ未設定）',
+           cohort: L.cohort || '', memo: L.memo || '' };
+}
+function downloadLessonPreMd(){
+  const H = lessonHead();
+  let md = `# 🌅 レッスン準備シート｜${H.theme}
+
+> サブ講師の事前準備用。Notionにそのまま貼り付けてください。進行・回答方針はメイン講師の指示に従います。
+
+| 項目 | 内容 |
+|------|------|
+| **実施日** | ${H.date} |
+| **章・単元** | ${H.theme} |
+| **クラス構成** | ${H.cohort} |
+| **メモ** | ${H.memo} |
+
+---
+
+## 🔮 出そうな質問と準備の計画
+
+| コマ・タイミング | 単元 | 出そうな質問（予想） | レベル | 文系/理系 | 準備するもの |
+|------|------|------|------|------|------|
+`;
+  if(S.preplan.length){
+    S.preplan.forEach(p=>{ md += `| ${cellMd(p.timing)} | ${cellMd(p.topic)} | ${cellMd(p.expectQ)} | ${cellMd(p.level)} | ${cellMd(p.target)} | ${cellMd(p.prep)} |\n`; });
+  } else { md += '| | | | | | |\n'; }
+  md += `
+---
+
+## ✅ 事前チェックリスト
+
+- [ ] 想定質問集DBをこの単元のキーワードで検索して中身を確認した
+- [ ] ヒントの小出し順（ヒント1＝考え方 → ヒント2＝経路 → ヒント3＝ほぼ答え）を準備した
+- [ ] 文系向けのたとえが世界観【${S.meta.world||'未設定'}】で統一されているか見直した
+- [ ] 参考記事のリンクが開けるか確認した
+- [ ] 進行・回答方針をメイン講師と確認した
+
+---
+
+> 🐰 当日出た質問は「🌙 レッスン後」モードでその場記録 → ⭐昇格でDBに育てましょう。
+`;
+  download(`レッスン準備シート_${safeName(H.theme)}.md`, md, 'text/markdown');
+}
+function downloadLessonPostMd(){
+  const H = lessonHead(); const c = logCounts();
+  let md = `# 🌙 レッスン実績レポート｜${H.theme}
+
+> Notionにそのまま貼り付けてください。氏名は記載せず役職・区分のみで運用します。
+
+| 項目 | 内容 |
+|------|------|
+| **実施日** | ${H.date} |
+| **章・単元** | ${H.theme} |
+| **クラス構成** | ${H.cohort} |
+
+---
+
+## 📊 サマリー
+
+| 指標 | 件数 |
+|------|------|
+| 質問総数 | ${S.qlog.length} |
+| ✅ 即答 | ${c.status['✅ 即答']||0} |
+| 🔵 宿題 | ${c.status['🔵 宿題']||0} |
+| 🟡 確認待ち（メイン講師確認中） | ${c.status['🟡 確認待ち']||0} |
+| 🔴 エスカレ（メイン講師へ） | ${c.status['🔴 エスカレ']||0} |
+| 📥 保留 | ${c.status['📥 保留']||0} |
+| 文系から / 理系から | ${c.target['文系']||0} / ${c.target['理系']||0} |
+| ⭐ 想定質問集へ昇格 | ${c.promoted} |
+
+---
+
+## 🗂 質問ログ
+
+| ID | 文系/理系 | レベル | 出た質問 | 答えた内容・対応 | ステータス | メモ |
+|----|------|------|------|------|------|------|
+`;
+  S.qlog.forEach(r=>{ md += `| ${cellMd(r.qid)} | ${cellMd(r.target)} | ${cellMd(r.level)} | ${cellMd(r.question)} | ${cellMd(r.answer)} | ${cellMd(r.status)} | ${cellMd(r.note)} |\n`; });
+  md += `
+---
+
+## 📈 KPT（その日のうちにひと言だけでも）
+
+### ✅ Keep
+-
+
+### 🔧 Problem
+-
+
+### 💡 Try（次回レッスンへ）
+
+| アクション | 期限 |
+|----------|------|
+| 🔵宿題・📥保留の回答を作って想定質問集DBへ追記 | 翌レッスンまで |
+| | |
+
+---
+
+> 🐰 事実と所感は分けて記録。🔴エスカレの一次報告先はメイン講師です。
+`;
+  download(`レッスン実績レポート_${safeName(H.theme)}.md`, md, 'text/markdown');
+}
+function cellMd(s){ return str(s).replace(/\|/g,'｜').replace(/\n/g,' '); }
+
+/* --- レッスン記録 専用Excel（4シート） --- */
+function downloadLessonExcel(){
+  if(!S.preplan.length && !S.qlog.length){
+    alert('まだ計画も質問ログも空です。🌅で計画を書くか、🌙でクイック記録してからどうぞ🐰'); return;
+  }
+  const H = lessonHead(); const c = logCounts();
+  const sheets = [];
+  /* レッスン情報＋サマリー */
+  const info = [[xT(`レッスン記録（${H.theme}）`,4)], []];
+  [['実施日',H.date],['章・単元',H.theme],['クラス構成',H.cohort],['メモ',H.memo]].forEach(([k,vv])=>info.push([xT(k,1), xT(vv,2)]));
+  info.push([]); info.push([xT('実績サマリー',4)]); info.push([xT('指標',1), xT('件数',1)]);
+  [['質問総数', S.qlog.length],
+   ['✅ 即答', c.status['✅ 即答']||0],['🔵 宿題', c.status['🔵 宿題']||0],
+   ['🟡 確認待ち（メイン講師確認中）', c.status['🟡 確認待ち']||0],
+   ['🔴 エスカレ（メイン講師へ）', c.status['🔴 エスカレ']||0],['📥 保留', c.status['📥 保留']||0],
+   ['文系から', c.target['文系']||0],['理系から', c.target['理系']||0],
+   ['⭐ 想定質問集へ昇格', c.promoted]].forEach(([k,n])=>info.push([xT(k), xN(n)]));
+  sheets.push({name:'レッスン情報', widths:[30,48], rows:info});
+  /* 準備計画 */
+  const pre = [[xT('出そうな質問と準備の計画（レッスン前）',4)],
+    ['No','コマ・タイミング','扱う単元','出そうな質問（予想）','レベル','文系/理系','準備するもの'].map(x=>xT(x,1))];
+  S.preplan.forEach((p,i)=>pre.push([xN(i+1), xT(p.timing), xT(p.topic), xT(p.expectQ,2), xT(p.level), xT(p.target), xT(p.prep,2)]));
+  sheets.push({name:'準備計画', widths:[5,13,15,36,7,9,34], rows:pre});
+  /* 事前チェック */
+  const chk = [[xT('事前チェックリスト（印刷して☑どうぞ）',4)], [xT('☑',1), xT('チェック項目',1)]];
+  ['想定質問集DBをこの単元のキーワードで検索して中身を確認した',
+   'ヒントの小出し順（考え方→経路→ほぼ答え）を準備した',
+   `文系向けのたとえが世界観【${S.meta.world||'未設定'}】で統一されているか見直した`,
+   '参考記事のリンクが開けるか確認した',
+   '進行・回答方針をメイン講師と確認した'].forEach(t=>chk.push([xT('☐'), xT(t,2)]));
+  sheets.push({name:'事前チェック', widths:[5,64], rows:chk});
+  /* 質問ログ */
+  const lg = [[xT(`質問ログ（レッスン後実績／${H.date}）`,4)],
+    ['ID','文系/理系','レベル','出た質問','答えた内容・対応','ステータス','メモ'].map(x=>xT(x,1))];
+  S.qlog.forEach(r=>lg.push([xT(r.qid), xT(r.target), xT(r.level), xT(r.question,2), xT(r.answer,2), xT(r.status), xT(r.note,2)]));
+  lg.push([]); lg.push([xT('採番ルール：✅即答=DN／🔵宿題=WI／🟡確認待ち=RV／🔴エスカレ=ES／📥保留=BL（各001から連番）')]);
+  sheets.push({name:'質問ログ', widths:[8,9,7,36,36,11,20], rows:lg});
+
+  download(`レッスン記録_${safeName(H.theme)}.xlsx`, buildXlsx(sheets), XLSX_MIME);
+}
+
+/* ================= XLSXライター（依存なし・本物の.xlsx／OOXML） =================
+   .xls(SpreadsheetML)はLibreOfficeのバージョンによって数式が「エラー:509」になる
+   環境依存が判明したため、A1形式の標準<f>数式を持つ正規の.xlsxを自前生成する。 */
+const CRC_TABLE = (()=>{ const t=new Uint32Array(256);
+  for(let n=0;n<256;n++){ let c=n; for(let k=0;k<8;k++) c = (c&1)?(0xEDB88320^(c>>>1)):(c>>>1); t[n]=c>>>0; } return t; })();
+function crc32(u8){ let c=0xFFFFFFFF;
+  for(let i=0;i<u8.length;i++) c = CRC_TABLE[(c^u8[i])&0xFF]^(c>>>8);
+  return (c^0xFFFFFFFF)>>>0; }
+function zipStore(files){ // files: [{name, data:Uint8Array}] → Uint8Array（無圧縮ZIP）
+  const enc = new TextEncoder();
+  let parts=[], central=[], offset=0;
+  for(const f of files){
+    const name = enc.encode(f.name), crc = crc32(f.data), sz = f.data.length;
+    const lh = new DataView(new ArrayBuffer(30));
+    lh.setUint32(0,0x04034b50,true); lh.setUint16(4,20,true); lh.setUint16(6,0x0800,true);
+    lh.setUint16(8,0,true); lh.setUint32(14,crc,true);
+    lh.setUint32(18,sz,true); lh.setUint32(22,sz,true);
+    lh.setUint16(26,name.length,true); lh.setUint16(28,0,true);
+    parts.push(new Uint8Array(lh.buffer), name, f.data);
+    const ch = new DataView(new ArrayBuffer(46));
+    ch.setUint32(0,0x02014b50,true); ch.setUint16(4,20,true); ch.setUint16(6,20,true);
+    ch.setUint16(8,0x0800,true); ch.setUint16(10,0,true); ch.setUint32(16,crc,true);
+    ch.setUint32(20,sz,true); ch.setUint32(24,sz,true); ch.setUint16(28,name.length,true);
+    ch.setUint32(42,offset,true);
+    central.push(new Uint8Array(ch.buffer), name);
+    offset += 30 + name.length + sz;
+  }
+  const cdStart = offset, cdSize = central.reduce((a,x)=>a+x.length,0);
+  const eo = new DataView(new ArrayBuffer(22));
+  eo.setUint32(0,0x06054b50,true); eo.setUint16(8,files.length,true); eo.setUint16(10,files.length,true);
+  eo.setUint32(12,cdSize,true); eo.setUint32(16,cdStart,true);
+  const total = offset + cdSize + 22, out = new Uint8Array(total);
+  let p=0; for(const x of [...parts, ...central, new Uint8Array(eo.buffer)]){ out.set(x,p); p+=x.length; }
+  return out;
+}
+function colName(n){ let s=''; while(n>0){ const m=(n-1)%26; s=String.fromCharCode(65+m)+s; n=(n-m-1)/26; } return s; }
+/* セル生成：xT=文字列, xN=数値, xF=数式（styleは 0=標準 1=見出し 2=折返し 3=黄色入力 4=タイトル） */
+function xT(v,s){ return {t:'s', v:str(v), s:s||0}; }
+function xN(v,s){ return {t:'n', v:Number(v)||0, s:s||0}; }
+function xF(f,s){ return {t:'f', v:f, s:s||0}; }
+function buildXlsx(sheets){ // sheets: [{name, widths:[文字数...], rows:[[cell|null,...],...]}]
+  const enc = new TextEncoder(), X = xesc;
+  const sheetXml = sh => {
+    let cols = '';
+    if(sh.widths && sh.widths.length){
+      cols = '<cols>' + sh.widths.map((w,i)=>`<col min="${i+1}" max="${i+1}" width="${w}" customWidth="1"/>`).join('') + '</cols>';
+    }
+    let rows = '';
+    sh.rows.forEach((row,ri)=>{
+      let cells = '';
+      (row||[]).forEach((c,ci)=>{
+        if(!c) return;
+        const ref = colName(ci+1)+(ri+1), st = c.s?` s="${c.s}"`:'';
+        if(c.t==='n')      cells += `<c r="${ref}"${st}><v>${c.v}</v></c>`;
+        else if(c.t==='f') cells += `<c r="${ref}"${st}><f>${X(c.v)}</f></c>`;
+        else if(str(c.v))  cells += `<c r="${ref}"${st} t="inlineStr"><is><t xml:space="preserve">${X(c.v)}</t></is></c>`;
+        else if(c.s)       cells += `<c r="${ref}"${st}/>`;
+      });
+      rows += `<row r="${ri+1}">${cells}</row>`;
+    });
+    return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">${cols}<sheetData>${rows}</sheetData></worksheet>`;
+  };
+  const sheetTags = sheets.map((s,i)=>`<sheet name="${X(s.name)}" sheetId="${i+1}" r:id="rId${i+1}"/>`).join('');
+  const wb = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
+<sheets>${sheetTags}</sheets><calcPr fullCalcOnLoad="1"/></workbook>`;
+  const wbRels = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+${sheets.map((s,i)=>`<Relationship Id="rId${i+1}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet${i+1}.xml"/>`).join('')}
+<Relationship Id="rIdS" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/>
+</Relationships>`;
+  const styles = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
+<fonts count="3"><font><sz val="10"/><name val="Yu Gothic"/></font><font><b/><sz val="10"/><color rgb="FF6B4A2B"/><name val="Yu Gothic"/></font><font><b/><sz val="12"/><color rgb="FFE06A1B"/><name val="Yu Gothic"/></font></fonts>
+<fills count="4"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill><fill><patternFill patternType="solid"><fgColor rgb="FFF6DFA4"/><bgColor rgb="FFF6DFA4"/></patternFill></fill><fill><patternFill patternType="solid"><fgColor rgb="FFFFF200"/><bgColor rgb="FFFFF200"/></patternFill></fill></fills>
+<borders count="1"><border><left/><right/><top/><bottom/><diagonal/></border></borders>
+<cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs>
+<cellXfs count="5">
+<xf numFmtId="0" fontId="0" fillId="0" borderId="0" applyAlignment="1"><alignment vertical="top"/></xf>
+<xf numFmtId="0" fontId="1" fillId="2" borderId="0" applyFont="1" applyFill="1" applyAlignment="1"><alignment vertical="center"/></xf>
+<xf numFmtId="0" fontId="0" fillId="0" borderId="0" applyAlignment="1"><alignment vertical="top" wrapText="1"/></xf>
+<xf numFmtId="0" fontId="0" fillId="3" borderId="0" applyFill="1"/>
+<xf numFmtId="0" fontId="2" fillId="0" borderId="0" applyFont="1"/>
+</cellXfs><cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles></styleSheet>`;
+  const ct = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
+<Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>
+<Default Extension="xml" ContentType="application/xml"/>
+<Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/>
+${sheets.map((s,i)=>`<Override PartName="/xl/worksheets/sheet${i+1}.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>`).join('')}
+<Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/>
+</Types>`;
+  const rootRels = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/>
+</Relationships>`;
+  const files = [
+    {name:'[Content_Types].xml', data:enc.encode(ct)},
+    {name:'_rels/.rels', data:enc.encode(rootRels)},
+    {name:'xl/workbook.xml', data:enc.encode(wb)},
+    {name:'xl/_rels/workbook.xml.rels', data:enc.encode(wbRels)},
+    {name:'xl/styles.xml', data:enc.encode(styles)},
+    ...sheets.map((s,i)=>({name:`xl/worksheets/sheet${i+1}.xml`, data:enc.encode(sheetXml(s))}))
+  ];
+  return zipStore(files);
+}
+const XLSX_MIME = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+
+/* ================= うさうさ案内（タブ別ひとこと） ================= */
+const USA_GUIDE = {
+  'tab-setting': '🐰 まずは①：研修テーマと「たとえの世界観」を1つにきめましょう。まよったら🎁サンプル一式でお試しを！',
+  'tab-prompt':  '🐰 ②：プロンプトをコピーしてAIへ。直接書きかえてもOK（自動保存）。下の🚀一気通貫なら取り込みまでおまかせ！',
+  'tab-import':  '🐰 ③：AIのJSONを貼るか、ExcelをそのままポンとどうぞJSON・Excelどちらの帰り道もここです。',
+  'tab-edit':    '🐰 ④：セルをクリックでそのまま書きこみ。今日出た質問は今日のうちに追記が、最強FAQへの近道です！',
+  'tab-search':  '🐰 ⑤：黄色の枠にキーワードをどうぞ。「ec2」でも「EC2」でもヒットします。',
+  'tab-assist':  '🐰 ⑥：ふわっとした質問はここへ。仮説→逆質問→⏱30秒レシピで、その場で答えがつくれます。',
+  'tab-lesson':  '🐰 ⑦：🌅前は計画、🌙後は実績。⭐昇格ボタンで今日の質問が明日の即答になります。',
+  'tab-article': '🐰 ⑨：元記事を道具にしたコーナー。数式ジェネレーターは手組み派の修理キットです。',
+  'tab-export':  '🐰 ⑩：おつかれさまでした！Excel（Sheets対応）とJSONバックアップで持ち帰りを。',
+  'tab-ws':      '🐰 ⑧：メイン講師の当日指示から、課題の想定質問→ヒント→誘導→答え（文系/理系）を一枚にまとめます。',
+  'tab-pdca':    '🐰 ⑪：研修折り返しの見える化。Good＆Moreと進捗％で、次の一手をきめましょう。'
+};
+function updateGuide(tab){
+  const g = document.getElementById('usaGuide');
+  if(g && USA_GUIDE[tab]) g.textContent = USA_GUIDE[tab];
+}
+
+/* ================= ころころキノコ（ひかえめ演出・OFF可） ================= */
+let mushOn = true;
+try{ mushOn = localStorage.getItem('usausa_mush') !== 'off'; }catch(_){}
+function mushToggleUI(){
+  const t = document.getElementById('mushToggle');
+  if(t) t.textContent = '🍄あそび:' + (mushOn ? 'ON' : 'OFF');
+}
+document.getElementById('mushToggle').addEventListener('click', ()=>{
+  mushOn = !mushOn;
+  try{ localStorage.setItem('usausa_mush', mushOn?'on':'off'); }catch(_){}
+  mushToggleUI();
+  if(!mushOn){ const m=document.getElementById('mushRunner'); m.style.display='none'; }
+  else scheduleMush(8000);
+});
+function reducedMotion(){
+  try{ return window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches; }catch(_){ return false; }
+}
+let mushTimer = null;
+function scheduleMush(delay){
+  if(mushTimer) clearTimeout(mushTimer);
+  if(!mushOn || reducedMotion()) return;
+  mushTimer = setTimeout(runMush, delay != null ? delay : 50000 + Math.random()*50000);
+}
+function runMush(){
+  const el = document.getElementById('mushRunner');
+  if(!mushOn || reducedMotion() || document.hidden || !el || !el.animate){ scheduleMush(); return; }
+  const W = Math.max(document.documentElement.clientWidth || 0, 600);
+  el.style.display = 'block';
+  const hide = Math.random() < 0.4;   // ときどき途中でかくれる
+  if(hide){
+    const stopX = W * (0.25 + Math.random()*0.5);
+    const a = el.animate(
+      [{ transform:'translateX(-60px) rotate(0deg)' },
+       { transform:`translateX(${stopX}px) rotate(${Math.round(stopX/22)*45}deg)` }],
+      { duration: 4200, easing:'linear' });
+    a.onfinish = ()=>{
+      const b = el.animate(
+        [{ transform:`translateX(${stopX}px) translateY(0) rotate(0deg)` },
+         { transform:`translateX(${stopX}px) translateY(8px) rotate(-8deg)` },
+         { transform:`translateX(${stopX}px) translateY(60px) rotate(0deg)` }],
+        { duration: 1300, easing:'ease-in' });   // ぴょこっとしてから草にもぐる
+      b.onfinish = ()=>{ el.style.display='none'; scheduleMush(); };
+    };
+  } else {
+    const a = el.animate(
+      [{ transform:'translateX(-60px) rotate(0deg)' },
+       { transform:`translateX(${W+80}px) rotate(${Math.round((W+140)/22)*45}deg)` }],
+      { duration: 5200 + Math.random()*1800, easing:'linear' });
+    a.onfinish = ()=>{ el.style.display='none'; scheduleMush(); };
+  }
+}
+mushToggleUI();
+scheduleMush(15000);   // 初回はひかえめに15秒後
+
+/* ================= PDCA中間チェックポイント ================= */
+['pcRound','pcPeriod','pcGoal'].forEach((id,ix)=>{
+  const keys=['round','period','goal'];
+  document.getElementById(id).addEventListener('change', e=>{
+    if(!S.pdcaInfo) S.pdcaInfo={round:'',period:'',goal:''};
+    S.pdcaInfo[keys[ix]] = e.target.value.trim(); autosave();
+  });
+});
+function loadPdcaToForm(){
+  if(!S.pdcaInfo) S.pdcaInfo={round:'第1回',period:'',goal:''};
+  set('pcRound', S.pdcaInfo.round); set('pcPeriod', S.pdcaInfo.period); set('pcGoal', S.pdcaInfo.goal);
+}
+function pdcaProgress(){
+  const nums = S.pdca.map(r=>{ const m = str(r.metric).match(/(\d{1,3})\s*[%％]/); return m?Math.min(100,parseInt(m[1],10)):null; }).filter(x=>x!==null);
+  return nums.length ? Math.round(nums.reduce((a,b)=>a+b,0)/nums.length) : null;
+}
+function updatePdcaSummary(){
+  const el = document.getElementById('pdcaSummary'); if(!el) return;
+  const p = pdcaProgress();
+  const cnt = ph => S.pdca.filter(r=>str(r.phase).startsWith(ph)).length;
+  if(p===null && !S.pdca.length){ el.textContent='進捗サマリー：指標に「60%」のように数値を入れると、ここに平均進捗が出ます🐰'; return; }
+  const bar = p===null ? '' : `　${'🟧'.repeat(Math.round(p/10))}${'⬜'.repeat(10-Math.round(p/10))} <b>${p}%</b>`;
+  el.innerHTML = `進捗サマリー：🅿${cnt('🅿')}・🅳${cnt('🅳')}・🅲${cnt('🅲')}・🅰${cnt('🅰')} 件${bar}${p!==null && p<50 ? '　🐰 折り返しで50%未満はネクストアクションの見直しどき' : ''}`;
+}
+function insertSamplePdca(){
+  S.pdca = S.pdca.concat([
+    {phase:'🅿 計画', item:'構成図の自力作成', detail:'最終発表までに全員がVPC〜RDSの基本構成図を描ける', metric:'目標：全員（達成度はCで測る）', due:'最終日'},
+    {phase:'🅳 実行', item:'演習3.5b', detail:'設計演習＋机間巡視で段階ヒント運用を実施', metric:'実施済', due:''},
+    {phase:'🅲 評価Good', item:'質問対応', detail:'想定質問集の検索ヒット率が高く、即答が増えた（質問ログ参照）', metric:'70%', due:''},
+    {phase:'🅲 評価More', item:'文系フォロー', detail:'たとえだけで止まる場面あり。技術用語への橋渡しをもう一歩', metric:'50%', due:''},
+    {phase:'🅰 改善', item:'橋渡しスライド', detail:'たとえ→技術用語の対応表を1枚作ってヒントシートに追加', metric:'', due:'次レッスンまで'}
+  ]);
+  renderTable('pdca'); autosave(); updatePdcaSummary();
+}
+function downloadPdcaMd(){
+  const I = S.pdcaInfo || {round:'',period:'',goal:''};
+  const p = pdcaProgress();
+  const rows = ph => S.pdca.filter(r=>str(r.phase).startsWith(ph));
+  const tbl = list => list.length
+    ? '| 項目 | 内容 | 指標・進捗 | 期限 |\n|------|------|------|------|\n' +
+      list.map(r=>`| ${cellMd(r.item)} | ${cellMd(r.detail)} | ${cellMd(r.metric)} | ${cellMd(r.due)} |`).join('\n') + '\n'
+    : '-\n';
+  const md = `# 🧭 中間チェックポイント｜${I.round || '第n回'}
+
+> 研修の折り返し確認。Good＆Moreの2本立て＋数値で見える化して、次の一手をきめます。
+
+| 項目 | 内容 |
+|------|------|
+| **対象期間** | ${I.period} |
+| **研修テーマ** | ${S.meta.title || ''} |
+| **最終ゴール** | ${I.goal} |
+| **平均進捗** | ${p===null?'—':p+'%'} |
+
+---
+
+## 🅿 計画（目標）
+
+${tbl(rows('🅿'))}
+## 🅳 実行（やったこと）
+
+${tbl(rows('🅳'))}
+## 🅲 評価｜Good（よかった点・事実ベース）
+
+${tbl(S.pdca.filter(r=>r.phase==='🅲 評価Good'))}
+## 🅲 評価｜More（のびしろ・改善余地）
+
+${tbl(S.pdca.filter(r=>r.phase==='🅲 評価More'))}
+## 🅰 改善（ネクストアクション）
+
+${tbl(rows('🅰'))}
+---
+
+> 🐰 評価は事実ベースで、所感はMoreに。次回チェックポイントでこのページを見返します。
+`;
+  download(`中間チェックポイント_${safeName(I.round||S.meta.title)}.md`, md, 'text/markdown');
+}
+
+/* ================= サブ講師うさぎ（だまって見守る・余計なことはしない） ================= */
+const SR_WATCH = ['みまもり中', 'かくにん', 'よくかんがえる', 'そうだんしてから', 'メイン講師が最優先', '事実と所感わける'];
+let srIdx = 0, srSupportTimer = null;
+function srSetBoard(t){ const el = document.getElementById('srBoardText'); if(el) el.textContent = t; }
+setInterval(()=>{                       // 見守り看板はゆっくり巡回（支援中はスキップ）
+  const r = document.getElementById('subRabbit');
+  if(!r || r.classList.contains('support') || document.hidden) return;
+  srIdx = (srIdx + 1) % SR_WATCH.length;
+  srSetBoard(SR_WATCH[srIdx]);
+}, 24000);
+function srSupport(){                   // 質問が来たらサポート宣言（ぴょこっと2回だけ）
+  const r = document.getElementById('subRabbit'); if(!r) return;
+  srSetBoard('サポートします!');
+  r.classList.remove('support'); void r.offsetWidth; r.classList.add('support');
+  if(srSupportTimer) clearTimeout(srSupportTimer);
+  srSupportTimer = setTimeout(()=>{ r.classList.remove('support'); srSetBoard(SR_WATCH[srIdx]); }, 9000);
+}
+['assistInput','qkQuestion'].forEach(id=>{
+  const el = document.getElementById(id);
+  if(el) el.addEventListener('input', ()=>{ if(el.value.trim().length === 3) srSupport(); });   // 打ち始めに一度だけ
+});
+
+/* ================= 当日資料工房 ================= */
+['wsName','wsDirective','wsTarget'].forEach((id,ix)=>{
+  const keys=['name','directive','target'];
+  document.getElementById(id).addEventListener('change', e=>{
+    if(!S.wsInfo) S.wsInfo={name:'',directive:'',target:''};
+    S.wsInfo[keys[ix]] = e.target.value.trim(); autosave();
+  });
+});
+function loadWsToForm(){
+  if(!S.wsInfo) S.wsInfo={name:'',directive:'',target:''};
+  set('wsName', S.wsInfo.name); set('wsDirective', S.wsInfo.directive); set('wsTarget', S.wsInfo.target);
+}
+function quickWs(){
+  const title = v('wkTitle');
+  if(!title){ alert('課題・問題を入力してください🐰'); return; }
+  S.ws.push({ kind:v('wkKind'), level:v('wkLevel'), title,
+    expectQ:v('wkExpectQ'), hint:v('wkHint'), guide:v('wkGuide'),
+    ansBunkei:v('wkAnsB'), ansRikei:v('wkAnsR') });
+  ['wkTitle','wkExpectQ','wkHint','wkGuide','wkAnsB','wkAnsR'].forEach(id=>set(id,''));
+  renderTable('ws'); autosave();
+  const t = document.getElementById('copiedToast'); t.textContent='📦 追加しました！（'+S.ws.length+'問目）';
+  t.classList.add('show'); setTimeout(()=>{t.classList.remove('show'); t.textContent='📋 コピーしました！';},1500);
+}
+function insertSampleWs(){
+  if(!S.wsInfo.name){ S.wsInfo = {name:'3.5b 追加ワーク：障害シナリオ演習', directive:'基本課題が早い人向けに追加2問。ヒントは段階的に、答えは最後まで見せない。', target:'新卒20名・文系7割'}; loadWsToForm(); }
+  S.ws = S.ws.concat([
+    {kind:'基本', level:'初級', title:'AZ-aが全滅したとき、サービスはどうなる？構成図で説明せよ',
+     expectQ:'全滅って、何が残ってれば動くんですか？', hint:'お客さまのリクエストを入口から順に追う',
+     guide:'ELBのヘルスチェック→残るAZ→RDSの順に確認', ansBunkei:'片方の建物が停電しても、案内係がもう一方の支店へ通すので営業は続く',
+     ansRikei:'ELBが異常AZのターゲットを切り離して残存AZへ分散、RDSはスタンバイへフェイルオーバー'},
+    {kind:'追加', level:'中級', title:'復旧後、AZ-aを安全に戻す手順を考えよ',
+     expectQ:'戻したら勝手に半分流れちゃいませんか？', hint:'いきなり全開にしない方法は？',
+     guide:'ヘルスチェック合格→少しずつ流量を戻す順番を考えさせる', ansBunkei:'再開した支店には、まず常連さんから少しずつ案内するイメージ',
+     ansRikei:'ターゲット復帰後はヘルスチェック合格を確認し、必要なら重み付けで段階的に戻す'},
+    {kind:'追加', level:'上級', title:'同じ障害をRDS側で起こした場合との違いを論ぜよ',
+     expectQ:'DBのフェイルオーバー中って書き込みどうなるんですか？', hint:'切り替わる「間」に何が起きるか',
+     guide:'フェイルオーバー所要時間→その間の接続→アプリ側の再試行の順', ansBunkei:'台帳係の交代の瞬間だけレジが一旦閉まる。並び直してもらえば続きから書ける',
+     ansRikei:'切替中は書き込み不可の断面が発生。接続の再試行とタイムアウト設計がアプリ側の論点'}
+  ]);
+  renderTable('ws'); autosave();
+}
+function wsDocData(){
+  const I = S.wsInfo || {name:'',directive:'',target:''};
+  return { name: I.name || '当日課題', directive: I.directive || '', target: I.target || '',
+    date: new Date().toLocaleDateString('ja-JP'),
+    base: S.ws.filter(r=>r.kind==='基本'), extra: S.ws.filter(r=>r.kind!=='基本') };
+}
+function wsItemMd(r, i){
+  return `### ${i+1}. ${cellMd(r.title)}　〔${r.level}〕
+
+| 段階 | 内容 |
+|------|------|
+| 💬 想定質問 | ${cellMd(r.expectQ)} |
+| 💡 ヒント（考え方） | ${cellMd(r.hint)} |
+| 🧭 誘導（経路） | ${cellMd(r.guide)} |
+| 🍡 答え：文系（たとえで） | ${cellMd(r.ansBunkei)} |
+| ⚙️ 答え：理系（技術で） | ${cellMd(r.ansRikei)} |
+`;
+}
+function buildWsMd(){
+  const D = wsDocData();
+  let md = `# 📦 当日サポート資料（講師用）｜${D.name}
+
+> ヒント→誘導→答えの順に小出しに。答えから見せない。開示範囲はメイン講師の指示に従う。
+
+| 項目 | 内容 |
+|------|------|
+| **作成日** | ${D.date} |
+| **対象** | ${D.target} |
+| **メイン講師の当日指示** | ${cellMd(D.directive)} |
+
+---
+
+## 🅰 基本問題（${D.base.length}問）
+
+${D.base.map(wsItemMd).join('\n')}
+---
+
+## 🅱 追加問題（はやい人向け・${D.extra.length}問）
+
+${D.extra.map(wsItemMd).join('\n')}
+---
+
+> 🐰 当日出た質問は「⑦🗂レッスン記録」へ。⭐昇格で想定質問集が育ちます。
+`;
+  return md;
+}
+function buildWsTxt(){
+  const D = wsDocData();
+  const item = (r,i)=>[
+    `${i+1}. ${str(r.title)} 〔${r.level}〕`,
+    `   💬想定質問: ${str(r.expectQ)}`,
+    `   💡ヒント  : ${str(r.hint)}`,
+    `   🧭誘導    : ${str(r.guide)}`,
+    `   🍡文系答え: ${str(r.ansBunkei)}`,
+    `   ⚙️理系答え: ${str(r.ansRikei)}`,''].join('\n');
+  return [
+    `==== 当日サポート資料（講師用）｜${D.name} ====`,
+    `作成日: ${D.date}　対象: ${D.target}`,
+    `メイン講師の当日指示: ${str(D.directive)}`,
+    `※ヒント→誘導→答えの順に小出し。開示範囲はメイン講師に従う。`,
+    '', `---- 基本問題（${D.base.length}問） ----`, '',
+    ...D.base.map(item),
+    `---- 追加問題（${D.extra.length}問） ----`, '',
+    ...D.extra.map(item),
+    `🐰 出た質問はレッスン記録へ。今日の追記が明日の即答。`
+  ].join('\n');
+}
+function wsGuard(){ if(!S.ws.length){ alert('まだ問題がありません。入力セクションか🎁サンプルからどうぞ🐰'); return false; } return true; }
+function downloadWsTxt(){ if(!wsGuard()) return; download(`当日資料メモ_${safeName((S.wsInfo||{}).name)}.txt`, buildWsTxt(), 'text/plain'); }
+function downloadWsMd(){ if(!wsGuard()) return; download(`当日サポート資料_${safeName((S.wsInfo||{}).name)}.md`, buildWsMd(), 'text/markdown'); }
+function printWsPdf(){
+  if(!wsGuard()) return;
+  const D = wsDocData();
+  const win = window.open('', '_blank');
+  if(!win){ alert('ポップアップがブロックされました。このサイトのポップアップを許可してください🐰'); return; }
+  const item = (r,i)=>`
+   <div class="qcard">
+     <div class="qhead"><b>${i+1}. ${esc(r.title)}</b>　<span class="lv">${esc(r.level)}</span></div>
+     <table>
+      <tr><th>💬 想定質問</th><td>${esc(r.expectQ)}</td></tr>
+      <tr><th>💡 ヒント（考え方）</th><td>${esc(r.hint)}</td></tr>
+      <tr><th>🧭 誘導（経路）</th><td>${esc(r.guide)}</td></tr>
+      <tr class="b"><th>🍡 文系（たとえで）</th><td>${esc(r.ansBunkei)}</td></tr>
+      <tr class="r"><th>⚙️ 理系（技術で）</th><td>${esc(r.ansRikei)}</td></tr>
+     </table>
+   </div>`;
+  win.document.write(`<!DOCTYPE html><html lang="ja"><head><meta charset="UTF-8">
+<title>当日サポート資料｜${esc(D.name)}</title>
+<style>
+ body{font-family:'Hiragino Maru Gothic ProN','Yu Gothic','Meiryo',sans-serif;background:#FFF7E8;color:#4A3424;margin:22px;font-size:11.5px;}
+ .band{background:linear-gradient(135deg,#E8867B,#E8B94A);color:#fff;border-radius:12px;padding:12px 18px;margin-bottom:10px;}
+ .band h1{font-size:17px;margin:0;} .band .sub{font-size:10.5px;opacity:.95;margin-top:3px;}
+ .meta{font-size:10.5px;color:#8A5A3B;background:#FFF2DC;border:1.5px dashed #E8B94A;border-radius:10px;padding:7px 12px;margin-bottom:10px;}
+ h2{font-size:13px;color:#E06A1B;border-bottom:2px dashed #F6DFA4;padding-bottom:3px;margin:14px 0 8px;}
+ .qcard{background:#fff;border:2px solid #F6DFA4;border-radius:12px;padding:10px 12px;margin-bottom:8px;page-break-inside:avoid;}
+ .qhead{margin-bottom:6px;} .lv{font-size:9.5px;background:#FFF2DC;border-radius:999px;padding:2px 8px;color:#8A5A3B;}
+ table{width:100%;border-collapse:collapse;} th{white-space:nowrap;text-align:left;font-size:10px;color:#9C7A55;padding:3px 8px 3px 0;vertical-align:top;width:110px;}
+ td{padding:3px 0;border-bottom:1px dotted #F0E2C8;}
+ tr.b td{background:#FFF7F0;} tr.r td{background:#F4FAF7;}
+ footer{text-align:center;font-size:9.5px;color:#9C7A55;margin-top:10px;}
+ @media print{ body{background:#fff;} }
+</style></head><body>
+<div class="band"><h1>📦 当日サポート資料（講師用）｜${esc(D.name)}</h1>
+<div class="sub">${esc(D.date)}　対象：${esc(D.target)}｜うさうさ研修工房 🐰</div></div>
+<div class="meta"><b>メイン講師の当日指示：</b>${esc(D.directive)}　／　ヒント→誘導→答えの順に小出し。開示範囲はメイン講師に従う。</div>
+<h2>🅰 基本問題（${D.base.length}問）</h2>${D.base.map(item).join('')}
+<h2>🅱 追加問題（はやい人向け・${D.extra.length}問）</h2>${D.extra.map(item).join('')}
+<footer>印刷ダイアログで「PDFに保存」を選んでください ｜「面白きこともなき世を面白く」</footer>
+<script>window.onload = ()=>{ setTimeout(()=>window.print(), 300); };<\/script>
+</body></html>`);
+  win.document.close();
+}
+
+/* ================= 時短100問ジェネレーター（資料 or キーワード） ================= */
+document.getElementById('srcFile').addEventListener('change', e=>{
+  const f = e.target.files[0]; if(!f) return;
+  const rd = new FileReader();
+  rd.onload = ()=>{ document.getElementById('srcText').value = str(rd.result); 
+    const st = document.getElementById('srcStatus'); st.style.display='block';
+    st.innerHTML = '📎 「'+esc(f.name)+'」を読み込みました（'+String(str(rd.result).length)+'字）。このまま「📚 時短生成スタート」へ🐰'; };
+  rd.readAsText(f);
+  e.target.value='';
+});
+function buildSourcePrompt(src, kws, count, part){
+  const theme = S.meta.title || (kws ? kws.split(/[,、]/)[0].trim()+' 研修' : '（資料のテーマを読み取って命名）');
+  const world = S.meta.world || 'うさうさラーメン店';
+  const partNote = part===1 ? `\n※今回は前半${Math.ceil(count/2)}問：基礎・概念・用語を中心に。`
+                 : part===2 ? `\n※今回は後半${Math.floor(count/2)}問：運用・トラブル・セキュリティ・発展・発表向けを中心に（前半と重複しない観点で）。`
+                 : `\n※質問数は${count}問。`;
+  const srcBlock = src ? `\n# 元になる研修資料（この内容から受講生が疑問に思いそうな点を抽出すること）\n----\n${src.slice(0,6000)}\n----` 
+                       : `\n# キーワード（この範囲から出題すること）\n${kws}`;
+  return `あなたはIT研修のベテラン講師です。次の${src?'研修資料':'キーワード'}をもとに、受講生の質問に即答するための「想定質問集」を作ってください。
+${srcBlock}
+
+# 必ず守ること
+- テーマ：${theme}／文系向け回答のたとえは【${world}】で全問統一
+- レベルは「初級／中級／上級／発表」の4区分をバランスよく
+- bunkei＝たとえで、rikei＝正確な技術用語で1〜3文
+- keywords には同義語・表記ゆれ（カタカナ／略語／ひらがな）をスペース区切りで（検索ヒット率を決める最重要列）
+- refBunkei／refRikei は、確実なURL（公式ドキュメントのトップ等）以外は「検索：◯◯ 図解」形式（嘘URL厳禁）
+- discussions（議論質問）${part===2?'は5問前後':'・advanced・hints・instructorHintsも適量'}
+- 固有名詞・個人情報・実在企業の案件情報は入れない${partNote}
+
+# 出力形式（最重要）
+次のJSON形式「だけ」を出力。前置き・後書き・コードブロック記号は不要。
+${QJSON_SPEC}`;
+}
+async function runSourceGen(){
+  const st = document.getElementById('srcStatus'), done = document.getElementById('srcDone');
+  const pBox = document.getElementById('srcPrompt'), pRow = document.getElementById('srcPromptRow');
+  st.style.display='block'; done.style.display='none'; pBox.style.display='none'; pRow.style.display='none';
+  const src = v('srcText'), kws = v('srcKeywords');
+  if(!src && !kws){ st.innerHTML='📄 資料を貼り付けるか、🔑キーワードを入れてください🐰'; return; }
+  const count = parseInt(v('srcCount'),10);
+  const append = v('srcApply')==='append';
+  if(aiMode==='manual'){
+    st.innerHTML='✍️ 手動モード：下のプロンプトをコピーしてAIへ。返ってきたJSONは「③📥インポート」に貼り付けてください🐰' + (count>=60?'（'+count+'問は2回に分けると安全です）':'');
+    pBox.textContent = buildSourcePrompt(src, kws, count, count>=60?1:0);
+    pBox.style.display='block'; pRow.style.display='flex';
+    return;
+  }
+  const parse = (text)=>{
+    let raw = text.replace(/^```(json)?/m,'').replace(/```\s*$/m,'').trim();
+    const a = raw.indexOf('{'), b = raw.lastIndexOf('}');
+    if(a>=0 && b>a) raw = raw.slice(a, b+1);
+    return normalizeImport(JSON.parse(raw));
+  };
+  try{
+    let inc;
+    if(count >= 60){
+      st.innerHTML = `📚 前半${Math.ceil(count/2)}問を調理中…（1/2）`;
+      const t1 = await callClaudeSmart([{role:'user', content:buildSourcePrompt(src,kws,count,1)}], false, 16000);
+      const inc1 = parse(t1);
+      st.innerHTML = `📚 前半${inc1.questions.length}問できました。後半を調理中…（2/2）`;
+      const t2 = await callClaudeSmart([{role:'user', content:buildSourcePrompt(src,kws,count,2)}], false, 16000);
+      const inc2 = parse(t2);
+      inc = {};
+      for(const k of Object.keys(inc1)) inc[k] = inc1[k].concat(inc2[k]);
+    } else {
+      st.innerHTML = `📚 ${count}問を調理中…（1〜2分お待ちください）`;
+      inc = parse(await callClaudeSmart([{role:'user', content:buildSourcePrompt(src,kws,count,0)}], false, 16000));
+    }
+    if(!inc.questions.length) throw new Error('質問データが含まれていませんでした');
+    applyImport(inc, append, null);
+    st.innerHTML = `📚 取り込み完了🐰 ${importCounts(inc)}<br><b>理系向け回答と参考記事URLのレビューは人間の仕事</b>——検索Excel／Notion mdは下からどうぞ。`;
+    done.style.display='block';
+  }catch(e){
+    if(e.manual || e.needKey){ st.innerHTML = offlineHint(e); return; }
+    if(e instanceof SyntaxError){
+      st.innerHTML='AIの出力をJSONとして読めませんでした（途切れた可能性）。<b>問題数を一段階減らして再実行</b>するか、✍️手動コピペ運用が確実です🐰';
+      return;
+    }
+    st.innerHTML = offlineHint(e);
+  }
+}
+/* --- Notion用マークダウン（DB全体） --- */
+function downloadDbNotionMd(){
+  if(!S.questions.length){ alert('質問集DBが空です🐰'); return; }
+  const title = S.meta.title || '想定質問集';
+  let md = `# 🍄 想定質問集｜${title}\n\n`;
+  md += `> たとえの世界観：**${S.meta.world||'—'}**｜質問 ${S.questions.length} 問・議論 ${S.discussions.length} 問｜文系にはたとえで、理系には技術で。\n\n---\n\n`;
+  const cats = [...new Set(S.questions.map(q=>q.category))];
+  for(const c of cats){
+    md += `## 📂 ${cellMd(c)}\n\n`;
+    S.questions.forEach((q,i)=>{
+      if(q.category!==c) return;
+      md += `### Q${i+1}. ${cellMd(q.question)}　〔${q.level}〕\n\n`;
+      md += `- 🍡 **文系（たとえで）**：${cellMd(q.bunkei)}\n`;
+      md += `- ⚙️ **理系（技術で）**：${cellMd(q.rikei)}\n`;
+      md += `- 🔑 ${cellMd(q.keywords)}\n`;
+      if(str(q.refBunkei)||str(q.refRikei)) md += `- 📰 参考｜文系: ${cellMd(q.refBunkei)||'—'}／理系: ${cellMd(q.refRikei)||'—'}\n`;
+      md += `\n`;
+    });
+  }
+  if(S.discussions.length){
+    md += `---\n\n## 💬 議論を深める質問\n\n`;
+    S.discussions.forEach((x,i)=>{
+      md += `**${i+1}. ${cellMd(x.question)}**（${cellMd(x.timing)}）\n\n- 🧭 誘導：${cellMd(x.guide)}\n- ✅ 期待する解答：${cellMd(x.expected)}\n- 🎯 ねらい：${cellMd(x.aim)}\n\n`;
+    });
+  }
+  if(S.advanced.length){
+    md += `---\n\n## 🚀 発展\n\n| 場所・場面 | 追加するもの | ねらい |\n|------|------|------|\n`;
+    S.advanced.forEach(x=>{ md += `| ${cellMd(x.place)} | ${cellMd(x.item)} | ${cellMd(x.aim)} |\n`; });
+    md += `\n`;
+  }
+  if(S.hints.length || S.instructorHints.length){
+    md += `---\n\n## 💡 ヒント\n\n**受講生に見せてよいヒント**\n\n`;
+    S.hints.forEach(x=>{ md += `- 【${cellMd(x.type)}】${cellMd(x.content)}\n`; });
+    md += `\n**講師専用・段階ヒント**\n\n`;
+    S.instructorHints.forEach(x=>{ md += `- 【${cellMd(x.stage)}】${cellMd(x.content)}\n`; });
+    md += `\n`;
+  }
+  md += `---\n\n> 🐰 うさうさ研修工房｜「面白きこともなき世を面白く」\n`;
+  download(`想定質問集_Notion用_${safeName(title)}.md`, md, 'text/markdown');
+}
+
+/* ================= 初期化 ================= */
+autoload(); loadSettingsToForm(); loadLessonToForm(); loadPdcaToForm(); loadWsToForm(); renderStats(); renderAllTables(); buildPrompts(); renderArticle();
+</script>
+
+</body>
+</html>
